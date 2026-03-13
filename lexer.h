@@ -28,8 +28,10 @@ typedef struct {
     Tokentype type;
 }Token;
 
-extern Token tokens[100];
-extern int tokencount;
+extern Token **tokens;
+extern int tokencount ;
+extern int capacity ;
+void initTokens();
 
-void tokenize( char* ch);
+void GetNextToken(FILE *fp);
 #endif

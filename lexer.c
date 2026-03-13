@@ -4,158 +4,186 @@
 #include<string.h>
 #include <ctype.h>
 
-Token tokens[100];
+Token **tokens;
 int tokencount = 0;
-
-void tokenize(char* ch)
+int capacity = 10;
+void initTokens()
 {
-    int i = 0;
-    while(ch[i]!=0)
+    tokens = malloc(sizeof(Token*) * capacity);
+}
+Token* CreateToken(Tokentype type, char *lexeme){
+    Token *t =(Token*)malloc(sizeof(Token));
+
+    t->type = type;
+    strcpy(t->lexeme,lexeme);
+    return t;
+}
+
+void addToken(Token *t)
+{
+    if(tokencount >= capacity)
     {
-        Token t;
-        t.lexeme[0]='\0';
-        if(ch[i]=='+'){
-            strcpy(t.lexeme,"+");
-            t.type = ADD;
-            tokens[tokencount++] = t ;
-            i++;
+        capacity *=2;
+        tokens = realloc(tokens, sizeof(Token*) * capacity);
+    }
+
+    tokens[tokencount++] = t;
+}
+
+void GetNextToken(FILE* fp)
+{
+    int ch;
+
+    while((ch = fgetc(fp))!=EOF)
+    {
+        if(isspace(ch))
+        continue;
+
+        if(ch=='+')
+        {
+            Token *t =CreateToken(ADD, "+");
+            addToken(t);       
         }
 
-        else if(ch[i]=='-'){
-            strcpy(t.lexeme,"-");
-            t.type = SUB;
-            tokens[tokencount++] = t ;
-            i++;
+        else if(ch=='-')
+        {
+            Token *t =CreateToken(SUB, "-");
+            addToken(t);       
         }
 
-        else if(ch[i]=='*'){
-            strcpy(t.lexeme,"*");
-            t.type= MUL;
-            tokens[tokencount++] = t;
-            i++;
+        else if(ch=='*')
+        {
+            Token *t =CreateToken(MUL, "*");
+            addToken(t);       
         }
 
-        else if(ch[i]=='/'){
-            strcpy(t.lexeme,"/");
-            t.type = DIV ; 
-            tokens[tokencount++] = t; 
-            i++;
+        else if(ch=='/')
+        {
+            Token *t =CreateToken(DIV, "/");
+            addToken(t);       
         }
 
-        else if(ch[i]=='%'){
-            strcpy(t.lexeme,"%");
-            t.type = MOD ; 
-            tokens[tokencount++] = t; 
-            i++;
-        }
-        else if(ch[i]=='('){
-            strcpy(t.lexeme,"(");
-            t.type = LP;
-            tokens[tokencount++]=t;
-            i++;
+        else if(ch=='%')
+        {
+            Token *t =CreateToken(MOD, "%");
+            addToken(t);       
         }
 
-        else if(ch[i]==')'){
-            strcpy(t.lexeme,")");
-            t.type = RP;
-            tokens[tokencount++]=t;
-            i++;
+        else if(ch=='(')
+        {
+            Token *t =CreateToken(LP, "(");
+            addToken(t);       
         }
 
-        else if(ch[i]=='='){
-            if(ch[i+1]=='=')
+        else if(ch==')')
+        {
+            Token *t =CreateToken(RP, ")");
+            addToken(t);       
+        }
+
+        else if(ch == '=')
+        {
+            int next = fgetc(fp);
+            if(next == '=')
             {
-                strcpy(t.lexeme,"==");
-                t.type = EQ;
-                tokens[tokencount++] = t;
-                i+=2;
+                Token *t =CreateToken(EQ, "==");
+                addToken(t);
             }
-            else{
-                strcpy(t.lexeme,"=");
-                t.type = ASSIGN;
-                tokens[tokencount++]=t;
-                i++;
+            else
+            {
+                Token *t=CreateToken(ASSIGN,"=");
+                addToken(t);
+                ungetc(next,fp);
             }
         }
 
-        else if(ch[i] == '<')
+        else if(ch == '<')
         {
-            if(ch[i+1] == '='){
-                strcpy(t.lexeme,"<=");
-                t.type = LE;
-                tokens[tokencount++] = t ;
-                i+=2;
+            int next = fgetc(fp);
+            if(next == '=')
+            {
+                Token *t = CreateToken(LE,"<=");
+                addToken(t);
             }
-            else{
-                strcpy(t.lexeme,"<");
-                t.type = LT;
-                tokens[tokencount++]=t;
-                i++;
+
+            else
+            {
+                Token *t = CreateToken(LT,"<");
+                addToken(t);
+                ungetc(next,fp);
             }
         }
 
-        else if(ch[i] == '>')
+        else if(ch == '>')
         {
-            if(ch[i+1] == '='){
-                strcpy(t.lexeme,">=");
-                t.type = GE;
-                tokens[tokencount++] = t ;
-                i+=2;
+            int next = fgetc(fp);
+            if(next == '=')
+            {
+                Token *t = CreateToken(GE,">=");
+                addToken(t);
             }
-            else{
-                strcpy(t.lexeme,">");
-                t.type = GT;
-                tokens[tokencount++] = t;
-                i++;
+
+            else
+            {
+                Token *t = CreateToken(GT,">");
+                addToken(t);
+                ungetc(next,fp);
             }
         }
 
-        else if(ch[i] == '!')
+        else if(ch == '!')
         {
-            if(ch[i+1] == '='){
-                strcpy(t.lexeme,"!=");
-                t.type = NE;
-                tokens[tokencount++] = t;
-                i+=2;
+            int next = fgetc(fp);
+            if(next == '=')
+            {
+                Token* t = CreateToken(NE,"!=");
+                addToken(t);
             }
-
-            else{
-                i++;
-            }
+            else
+            ungetc(next,fp);
         }
-        else if(isdigit(ch[i])){
-            int c=0 ; // This c is used to check whether the decimal point has occurred before or not.
+
+        else if(isdigit(ch) || ch == '.')
+        {
+            char buffer[50];
+            int c=0;
             int j=0;
-            while(isdigit(ch[i]) || (ch[i] == '.' && c == 0)){
-                if(ch[i]=='.'){
-                    c += 1 ;
+            do{
+                if(ch == '.'){
+                    c+=1;
+                    if(!isdigit(getc(fp))){
+                        
+                        break;
+                    }
                 }
-                t.lexeme[j++] = ch [i++];
-            }
-            t.lexeme[j]='\0';
-            t.type = NUM;
-            tokens[tokencount++]=t;
+                buffer[j++] = ch;
+                ch = fgetc(fp);
+            }while(isdigit(ch) || (ch=='.' && c == 0));
+
+            buffer[j]='\0';
+            ungetc(ch,fp);
+            Token *t = CreateToken(NUM, buffer);
+            addToken(t);
         }
 
-        else if (isalpha(ch[i]) || ch[i]=='_')
+        else if(isalpha(ch) || ch == '_')
         {
+            char buffer[32];
             int j=0;
-            while(isalnum(ch[i]) || (ch[i] == '_'))
+            do
             {
-                t.lexeme[j++] = ch [i++];
-            }
-            t.lexeme[j]='\0';
-            t.type = ID;
-            tokens[tokencount++] = t;            
-        }
-
-        else {
-            i++;
+                buffer[j++] = ch;
+                ch = fgetc(fp);
+            }while(isalnum(ch) || (ch == '_'));
+            
+            buffer[j] = '\0';
+            ungetc(ch,fp);
+            Token *t = CreateToken(ID , buffer);
+            addToken(t);
         }
     }
 
-    Token t;
-    strcpy(t.lexeme,"EOF");
-    t.type=EOI;
-    tokens[tokencount++] = t; 
+    Token *t = CreateToken(EOI , "EOF");
+    addToken(t);
+
 }
