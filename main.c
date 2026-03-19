@@ -1,14 +1,10 @@
 #include<stdio.h>
-#include"lexer.h"
-
+#include "include/lexer.h"
+#include "include/parser.h"
+#include "include/AST.h"
 int main()
 {
-    char input[200];
-    // printf("Enter Expression: ");
-    // fgets(input,sizeof(input),stdin);
-
     FILE *fp;
-    char ch;
 
     char filename[100];
 
@@ -30,5 +26,10 @@ int main()
     printf("%s -> %d \n ", tokens[i]->lexeme , tokens[i]->type);
 
     fclose(fp);
+
+    Node* root = parse();
+
+    printf("\nAST Tree : \n");
+    printProgram(root);
     return 0;
 }

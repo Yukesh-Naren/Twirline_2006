@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
-#include "lexer.h"
 
+#include<stdio.h>
 typedef enum {
     EOI,    //End of Input
     SEMI,   // ; 
@@ -20,7 +20,8 @@ typedef enum {
     EQ,     // ==
     NE,     // !=
     NUM,    // numbers
-    ID      // identifiers
+    ID,     // identifiers
+    KEY     // keywords
 }Tokentype;
 
 typedef struct {

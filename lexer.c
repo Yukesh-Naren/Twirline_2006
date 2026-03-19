@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include "lexer.h"
+#include "include/lexer.h"
 #include<string.h>
 #include <ctype.h>
 
@@ -26,10 +26,20 @@ void addToken(Token *t)
         capacity *=2;
         tokens = realloc(tokens, sizeof(Token*) * capacity);
     }
-
+    
     tokens[tokencount++] = t;
 }
 
+int  keyword_checking( char buffer[])
+{
+    if (strcmp(buffer,"char") == 0 || strcmp(buffer,"int ") == 0 || strcmp(buffer,"while") == 0 || strcmp(buffer,"double") == 0 || strcmp(buffer,"float") == 0 || strcmp(buffer,"if") == 0 || strcmp(buffer,"else") == 0 || strcmp(buffer,"long") == 0 )
+    {
+        Token *t =CreateToken(KEY , buffer);
+        addToken(t);
+        return 1;
+    }
+    return 0;
+}
 void GetNextToken(FILE* fp)
 {
     int ch;
@@ -81,6 +91,12 @@ void GetNextToken(FILE* fp)
             addToken(t);       
         }
 
+        else if(ch == ';')
+        {
+            Token *t = CreateToken(SEMI,";");
+            addToken(t);
+        }
+        
         else if(ch == '=')
         {
             int next = fgetc(fp);
@@ -178,6 +194,8 @@ void GetNextToken(FILE* fp)
             
             buffer[j] = '\0';
             ungetc(ch,fp);
+            if(keyword_checking(buffer))
+            continue;
             Token *t = CreateToken(ID , buffer);
             addToken(t);
         }
