@@ -190,6 +190,14 @@ void GetNextToken(FILE* fp)
                 Token *t = CreateToken(INT , buffer);
                 addToken(t);
                 continue;
+            }else if(strcmp(buffer, "float") == 0) {
+                Token *t=CreateToken(FLOAT, buffer);
+                addToken(t);
+                continue;
+            }else if(strcmp(buffer,"double")==0){
+                Token *t=CreateToken(FLOAT, buffer);
+                addToken(t);
+                continue;
             }
             Token *t = CreateToken(ID , buffer);
             addToken(t);
