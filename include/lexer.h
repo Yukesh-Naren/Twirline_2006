@@ -20,6 +20,7 @@ typedef enum {
     EQ,     // ==
     NE,     // !=
     NUM,    // numbers
+    ID,     // identifier
     INT,     // integer
 }Tokentype;
 

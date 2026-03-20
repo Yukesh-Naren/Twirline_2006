@@ -10,7 +10,7 @@ typedef enum{
     NODE_OP,
     NODE_ASSIGN,
     NODE_DECL,
-    NODE_DECL_ASSN
+    NODE_DECL_ASSN,
     NODE_TYPE,
 }NodeType;
 

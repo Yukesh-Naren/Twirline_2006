@@ -2,7 +2,7 @@
 #include "include/parser.h"
 #include<stdio.h>
 #include<stdlib.h>
-
+#include<string.h>
 int current = 0;
 Token* current_token;
 
@@ -67,7 +67,7 @@ Node* parse_fact(){
     }
 
     if(current_token->type == NUM ){
-        Node* node =CreateNode(current_token->lexeme,NODE_NUM_LITERAL);
+        Node* node =CreateNode(current_token->lexeme,NODE_INT_LITERAL);
         advance();
         return node;
     }
@@ -189,8 +189,12 @@ Node* parse_program(){
 
     // printf("Parsing statement...\n");
     while(current_token->type !=EOI){
-        Node* stmt = parse_statement();
+        if(current_token->type == SEMI){
+            advance();
+            continue;
+        }
 
+        Node* stmt = parse_statement();
         if(head == NULL){
             head = stmt;
             temp = stmt;

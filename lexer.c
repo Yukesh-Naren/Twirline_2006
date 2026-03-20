@@ -187,7 +187,7 @@ void GetNextToken(FILE* fp)
             ungetc(ch,fp);
             //check here to add as a keyword
             if(strcmp(buffer,"int") == 0){
-                Token *t = CreateTokem(INT , buffer);
+                Token *t = CreateToken(INT , buffer);
                 addToken(t);
             }
             continue;
