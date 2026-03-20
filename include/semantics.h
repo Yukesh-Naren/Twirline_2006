@@ -3,7 +3,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-
+#include "AST.h"
 typedef struct Symbol{
     char name[50];
     int is_init;
@@ -12,7 +12,7 @@ typedef struct Symbol{
 }Symbol;
 
 void add_symbol(char* name , int init);
-int lookup_symbol(char* name);
+Symbol* lookup_symbol(char* name);
 void print_symbol_table();
-
+void check_semantics(Node* node);
 #endif

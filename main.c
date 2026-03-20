@@ -2,6 +2,7 @@
 #include "include/lexer.h"
 #include "include/parser.h"
 #include "include/AST.h"
+#include "include/semantics.h"
 int main()
 {
     FILE *fp;
@@ -33,14 +34,13 @@ int main()
         printf("\nAST Tree : \n");
         printProgram(root);
         freeAST(root);
+
+    printf("\nRunning Semantic Analysis...\n");
+    check_semantics(root);
+    printf("Semantic Analysis: PASSED (No undefined variables).\n");
+
+    print_symbol_table();
     }
-
-    // printf("\nRunning Semantic Analysis...\n")
-    // check_semantics(ast_root);
-    // printf("Semantic Analysis: PASSED (No undefined variables).\n");
-
-    // print_symbol_table();
-    // }
 
     else {
         printf("Parsing failed. No AST generated.\n");

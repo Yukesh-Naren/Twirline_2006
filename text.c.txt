@@ -7,4 +7,4 @@ a == b * c;
 (a + b) * c;
 x(int);
 t(int) = 5;
-o(int) = 9* a+b;
+o(int) = 9 * a + b;
