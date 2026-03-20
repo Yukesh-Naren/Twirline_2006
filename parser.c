@@ -44,7 +44,17 @@ Node* parse_declaration(){
     char* var_name = current_token->lexeme;
     match(ID);
     match(LP);
-    match(INT);
+    char* type_name;
+    if (current_token->type == INT) {
+        type_name = "int";
+        match(INT);
+    } else if (current_token->type == FLOAT) {
+        type_name = "float";
+        match(FLOAT);
+    } else {
+        printf("Syntax Error: Expected 'int' or 'float' but got '%s'\n", current_token->lexeme);
+        exit(1);
+    }
     match(RP);
     if(current_token->type == SEMI){
         Node* n = CreateNode("Declaration",NODE_DECL);
