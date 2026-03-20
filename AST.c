@@ -3,10 +3,11 @@
 #include<stdlib.h>
 #include"include/AST.h"
 
-Node* CreateNode(char* val){
+Node* CreateNode(char* val, NodeType type){
     Node* node = (Node*)malloc(sizeof(Node));
     node->val = strdup(val);
-    node->left =NULL;
+    node->type = type;
+    node->left = NULL;
     node->right = NULL;
     return node;
 }

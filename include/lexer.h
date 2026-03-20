@@ -20,8 +20,7 @@ typedef enum {
     EQ,     // ==
     NE,     // !=
     NUM,    // numbers
-    ID,     // identifiers
-    KEY     // keywords
+    INT,     // integer
 }Tokentype;
 
 typedef struct {

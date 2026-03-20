@@ -28,16 +28,51 @@ int  match (int expected_type){
         exit(1);
     }
 }
+Node* parse_declaration_assignment(char* var_name){
+
+    Node* expr = parse_expr();
+
+    Node* n = CreateNode("=",NODE_ASSIGN);
+    n->left = CreateNode(var_name , NODE_ID);
+    n->right = expr;
+    n->type = NODE_DECL_ASSN;
+
+    return n;
+} // Gets input like x(int) = 5;
+
+Node* parse_declaration(){
+    char* var_name = strdup(current_token->lexeme);
+    match(ID);
+    match(LP);
+    match(INT);
+    match(RP);
+    if(current_token->type == SEMI){
+        Node* n = CreateNode(var_name, NODE_DECL);
+        n->left = CreateNode("int",NODE_TYPE);
+        return n;
+    }
+    else if(match(ASSIGN)){
+        Node* n = parse_declaration_assignment(var_name);
+        return n;
+    }
+    printf("Syntax Error: Expected ';' ");
+    exit(1);
+ }  //Gets input like x(int);
 
 Node* parse_fact(){
-    if(current_token->type == ID || current_token->type == NUM){
-        Node* node =CreateNode(current_token->lexeme);
+    if(current_token->type == ID ){
+        Node* node =CreateNode(current_token->lexeme,NODE_ID);
         advance();
         return node;
     }
 
+    if(current_token->type == NUM ){
+        Node* node =CreateNode(current_token->lexeme,NODE_NUM_LITERAL);
+        advance();
+        return node;
+    }
     if(match(LP)){
-        Node* node = parse_assign();
+        Node* node = parse_expr();
         match(RP);
         return node;
     }
@@ -53,7 +88,7 @@ Node* parse_term(){
         advance();
 
         Node* right = parse_fact();
-        Node* node = CreateNode(op);
+        Node* node = CreateNode(op,NODE_OP);
         node->left = left;
         node->right = right;
 
@@ -70,7 +105,7 @@ Node* parse_expr(){
         advance();
 
         Node* right = parse_term();
-        Node* node = CreateNode(op);
+        Node* node = CreateNode(op,NODE_OP);
         node->left = left;
         node->right = right;
 
@@ -86,7 +121,7 @@ Node* parse_equal(){
         advance();
 
         Node* right = parse_relation();
-        Node* node = CreateNode("==");
+        Node* node = CreateNode("==",NODE_OP);
         node->left = left;
         node->right = right;
 
@@ -103,7 +138,7 @@ Node* parse_relation(){
         advance();
         Node* right =parse_expr();
 
-        Node* node = CreateNode(op);
+        Node* node = CreateNode(op,NODE_OP);
         node->left = left;
         node->right = right;
 
@@ -114,22 +149,24 @@ Node* parse_relation(){
 
 Node* parse_assign(){
     if(current_token->type == ID){
-        Token* temp = current_token;
-        printf("Parsing Assignment...\n");
+        if((current+1)<tokencount && tokens[current+1]->type == LP){
+            return parse_declaration();
+        }
+        // printf("Parsing Assignment...\n");
         if((current+1)<tokencount && tokens[current+1]->type == ASSIGN){
+            char* name = strdup(current_token->lexeme);
             advance();
-            advance();
+            match(ASSIGN);
 
             Node* right =parse_assign();
 
-            Node* node = CreateNode("=");
-            node->left = CreateNode(temp->lexeme);
+            Node* node = CreateNode("=",NODE_ASSIGN);
+            node->left = CreateNode(name,NODE_ID);
             node->right = right;
 
             return node;
         }
     }
-
     return parse_equal();
 }
 
@@ -150,7 +187,7 @@ Node* parse_program(){
     Node* head =NULL;
     Node* temp = NULL;
 
-    printf("Parsing statement...\n");
+    // printf("Parsing statement...\n");
     while(current_token->type !=EOI){
         Node* stmt = parse_statement();
 

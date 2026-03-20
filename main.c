@@ -29,7 +29,20 @@ int main()
 
     Node* root = parse();
 
-    printf("\nAST Tree : \n");
-    printProgram(root);
+    if(root!=NULL){
+        printf("\nAST Tree : \n");
+        printProgram(root);
+    }
+
+    // printf("\nRunning Semantic Analysis...\n")
+    // check_semantics(ast_root);
+    // printf("Semantic Analysis: PASSED (No undefined variables).\n");
+
+    // print_symbol_table();
+    // }
+
+    else {
+        printf("Parsing failed. No AST generated.\n");
+    }
     return 0;
 }

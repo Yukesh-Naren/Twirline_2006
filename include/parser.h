@@ -15,5 +15,6 @@ Node* parse_fact();
 Node* parse_assign();
 Node* parse_relation();
 Node* parse_equal();
-
+Node* parse_declaration();
+Node* parse_declaration_assignment(char* var_name);
 #endif
