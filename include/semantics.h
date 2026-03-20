@@ -7,6 +7,7 @@
 typedef struct Symbol{
     char name[50];
     int is_init;
+    int value;
     struct Symbol* next;
 }Symbol;
 

@@ -189,8 +189,8 @@ void GetNextToken(FILE* fp)
             if(strcmp(buffer,"int") == 0){
                 Token *t = CreateToken(INT , buffer);
                 addToken(t);
+                continue;
             }
-            continue;
             Token *t = CreateToken(ID , buffer);
             addToken(t);
         }

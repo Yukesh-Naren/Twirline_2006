@@ -32,6 +32,7 @@ int main()
     if(root!=NULL){
         printf("\nAST Tree : \n");
         printProgram(root);
+        freeAST(root);
     }
 
     // printf("\nRunning Semantic Analysis...\n")

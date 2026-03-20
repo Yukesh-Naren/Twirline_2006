@@ -1,4 +1,5 @@
 #include "semantics.h"
+#include "parser.h"
 #include <string.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -22,31 +23,38 @@ void add_symbol(char* name , int init){
     head = new_sym;
 }
 
-int lookup_symbol(char* name){
+Symbol* lookup_symbol(char* name){
     Symbol* s = head;
     while (s != NULL){
         if(strcmp(s->name , name) == 0)
-        return 1;
+        return s;
         s=s->next;
     }
-    return 0;
+    return NULL;
 }
 
 void check_semantics(Node* node){
     if(node == NULL)return;
 
-    if(strcmp(node->val, "=") == 0){
+    if( node->type == NODE_DECL_ASSN){
         check_semantics(node->right);
-        add_symbol(node->left->val ,1 );
+        add_symbol(node->left->left->val ,1 );
     }
 
-    else if (node ->left == NULL  && node ->right == NULL ){
-        if(node->val[0]>='a' && node->val[0] <= 'z'){
-            if(lookup_symbol(node->val) == 0){
-                printf("SEMANTIC ERROR: Variable '%s' used before assignment!\n", node->val);
-                exit(1);
-            }
+    else if(node ->type == NODE_DECL){
+        add_symbol(node->left->val,0);
+    }
+
+    else if(node->type == NODE_ID){
+        if(lookup_symbol(node->val) == NULL){
+            printf("SEMANTIC ERROR: Variable '%s' used before assignment!\n", node->val);
+            exit(1);
         }
+    }
+
+    else if(node->type == NODE_ASSIGN){
+        check_semantics(node->right);
+        add_symbol(node->left->val,1);
     }
     else{
         check_semantics(node->left);

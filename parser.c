@@ -2,7 +2,6 @@
 #include "include/parser.h"
 #include<stdio.h>
 #include<stdlib.h>
-#include<string.h>
 int current = 0;
 Token* current_token;
 
@@ -32,26 +31,29 @@ Node* parse_declaration_assignment(char* var_name){
 
     Node* expr = parse_expr();
 
-    Node* n = CreateNode("=",NODE_ASSIGN);
-    n->left = CreateNode(var_name , NODE_ID);
-    n->right = expr;
-    n->type = NODE_DECL_ASSN;
+    Node* n = CreateNode("Decl_Assign",NODE_DECL_ASSN);
+    n->left = CreateNode("=" , NODE_ASSIGN);
+    n->left->left = CreateNode(var_name , NODE_ID);
+    n->left->right = expr;
+    // n->type = NODE_DECL_ASSN;
 
     return n;
 } // Gets input like x(int) = 5;
 
 Node* parse_declaration(){
-    char* var_name = strdup(current_token->lexeme);
+    char* var_name = current_token->lexeme;
     match(ID);
     match(LP);
     match(INT);
     match(RP);
     if(current_token->type == SEMI){
-        Node* n = CreateNode(var_name, NODE_DECL);
-        n->left = CreateNode("int",NODE_TYPE);
+        Node* n = CreateNode("Declaration",NODE_DECL);
+        n->left = CreateNode(var_name, NODE_ID);
+        n->left->left = CreateNode("int",NODE_TYPE);
         return n;
     }
-    else if(match(ASSIGN)){
+    else if(current_token->type == ASSIGN){
+        match(ASSIGN);
         Node* n = parse_declaration_assignment(var_name);
         return n;
     }
@@ -71,13 +73,14 @@ Node* parse_fact(){
         advance();
         return node;
     }
-    if(match(LP)){
+    if(current_token->type  == LP){
+        match(LP);
         Node* node = parse_expr();
         match(RP);
         return node;
     }
 
-    printf("Syntax Error: Expected Number or Identifier");
+    printf("Syntax Error: Expected Number or Identifier but got '%s'\n",current_token->lexeme);
     exit(1);
 }
 Node* parse_term(){
@@ -154,7 +157,7 @@ Node* parse_assign(){
         }
         // printf("Parsing Assignment...\n");
         if((current+1)<tokencount && tokens[current+1]->type == ASSIGN){
-            char* name = strdup(current_token->lexeme);
+            char* name = current_token->lexeme;
             advance();
             match(ASSIGN);
 
@@ -163,7 +166,8 @@ Node* parse_assign(){
             Node* node = CreateNode("=",NODE_ASSIGN);
             node->left = CreateNode(name,NODE_ID);
             node->right = right;
-
+//             printf("LEFT: %s\n", node->left ? node->left->val : "NULL");
+// printf("RIGHT: %s\n", node->right ? node->right->val : "NULL");
             return node;
         }
     }
@@ -174,6 +178,7 @@ Node* parse_statement(){
     Node* stmt = parse_assign();
 
     if(current_token->type != SEMI){
+        printf("Error near token: %s\n", current_token->lexeme);
         printf("Syntax Error: Expected ';'\n");
         exit(1);
     }

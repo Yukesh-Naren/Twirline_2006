@@ -25,4 +25,5 @@ typedef struct Node{
 Node* CreateNode(char* val, NodeType type);
 void printProgram(Node* root);
 void printAST(Node* root , int level);
+void freeAST(Node* root);
 #endif
