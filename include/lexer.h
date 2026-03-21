@@ -22,6 +22,7 @@ typedef enum {
     NUM,    // numbers
     ID,     // identifier
     INT,     // integer
+    FLOAT,
 }Tokentype;
 
 typedef struct {

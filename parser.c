@@ -48,7 +48,7 @@ Node* parse_declaration(){
     if (current_token->type == INT) {
         type_name = "int";
         match(INT);
-    } else if (current_token->type == FLOAT) {
+    } else if (current_token->type==FLOAT) {
         type_name = "float";
         match(FLOAT);
     } else {
