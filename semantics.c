@@ -1,87 +1,105 @@
-#include "semantics.h"
-#include "parser.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include<stdio.h>
-#include<stdlib.h>
+#include "ast.h"
+#include "semantics.h"
 
-Symbol* head = NULL;
+/*
+Assumption:
+- Identifiers already have a type assigned somewhere (symbol table or manually)
+- Constants are detected using NodeType
+*/
 
-void add_symbol(char* name , int init){
-    Symbol* s = head;
-    while(s!=NULL){
-        if(strcmp(s->name, name)  == 0){
-            s->is_init = init;
-            return;
-        }
-        s=s->next;
-    }
-
-    Symbol* new_sym = (Symbol*)malloc(sizeof(Symbol));
-    strcpy(new_sym->name, name);
-    new_sym->is_init = init;
-    new_sym->next = head ; 
-    head = new_sym;
+void semanticError(const char *msg)
+{
+    printf("Semantic Error: %s\n", msg);
+    exit(1);
 }
 
-Symbol* lookup_symbol(char* name){
-    Symbol* s = head;
-    while (s != NULL){
-        if(strcmp(s->name , name) == 0)
-        return s;
-        s=s->next;
+/* Determine type of a leaf node */
+char* getLeafType(Node* node)
+{
+    if (node->type == NODE_CONST)
+    {
+        // simple check: if contains '.' → float else int
+        if (strchr(node->val, '.') != NULL)
+            return "float";
+        else
+            return "int";
     }
+
+    if (node->type == NODE_ID)
+    {
+        // For now assume identifiers are int (or extend using symbol table)
+        return "int";
+    }
+
     return NULL;
 }
 
-void check_semantics(Node* node){
-    if(node == NULL)return;
+/* Type checking for operations */
+char* checkOpType(char* left, char* right, char* op)
+{
+    // Arithmetic
+    if (!strcmp(op, "+") || !strcmp(op, "-") ||
+        !strcmp(op, "*") || !strcmp(op, "/"))
+    {
+        if (!strcmp(left, "int") && !strcmp(right, "int"))
+            return "int";
 
-    if( node->type == NODE_DECL_ASSN){
-        check_semantics(node->right);
-        add_symbol(node->left->left->val ,1 );
+        if ((!strcmp(left, "int") && !strcmp(right, "float")) ||
+            (!strcmp(left, "float") && !strcmp(right, "int")) ||
+            (!strcmp(left, "float") && !strcmp(right, "float")))
+            return "float";
+
+        semanticError("Invalid operands for arithmetic operation");
     }
 
-    else if(node ->type == NODE_DECL){
-        add_symbol(node->left->val,0);
+    // Assignment
+    if (!strcmp(op, "="))
+    {
+        if (strcmp(left, right) != 0)
+            semanticError("Type mismatch in assignment");
+
+        return left;
     }
 
-    else if(node->type == NODE_ID){
-        if(lookup_symbol(node->val) == NULL){
-            printf("SEMANTIC ERROR: Variable '%s' used before assignment!\n", node->val);
-            exit(1);
-        }
-    }
-
-    else if(node->type == NODE_ASSIGN){
-        check_semantics(node->right);
-        add_symbol(node->left->val,1);
-    }
-    else{
-        check_semantics(node->left);
-        check_semantics(node->right);
-    }
-    
-    if(node->next)
-    check_semantics(node->next);
-
+    semanticError("Unknown operator");
+    return NULL;
 }
 
-void print_symbol_table() {
-    Symbol* current = head;
-    printf("\n--- SYMBOL TABLE ---\n");
-    printf("%-15s | %-10s\n", "Variable", "Initialized");
-    printf("-------------------------------\n");
-    
-    if (current == NULL) {
-        printf("(Table is empty)\n");
-        return;
+/* Main semantic analyzer */
+char* analyze(Node* root)
+{
+    if (root == NULL)
+        return NULL;
+
+    // Handle statement list using next pointer
+    if (root->next != NULL)
+        analyze(root->next);
+
+    // Leaf node
+    if (root->left == NULL && root->right == NULL)
+    {
+        char* t = getLeafType(root);
+
+        printf("Leaf: %s -> %s\n", root->val, t);
+
+        return t;
     }
 
-    while (current != NULL) {
-        printf("%-15s | %-10s\n", 
-               current->name, 
-               current->is_init ? "Yes" : "No");
-        current = current->next;
+    // Analyze children
+    char* leftType = analyze(root->left);
+    char* rightType = analyze(root->right);
+
+    printf("Checking: %s (%s , %s)\n", root->val, leftType, rightType);
+
+    // Operation node
+    if (root->type == NODE_OP || root->type == NODE_ASSIGN)
+    {
+        char* result = checkOpType(leftType, rightType, root->val);
+        return result;
     }
-    printf("-------------------------------\n\n");
+
+    return NULL;
 }

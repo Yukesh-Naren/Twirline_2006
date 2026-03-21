@@ -6,7 +6,7 @@
 
 typedef enum{
     NODE_ID,
-    NODE_INT_LITERAL,
+    NODE_CONST,
     NODE_OP,
     NODE_ASSIGN,
     NODE_DECL,

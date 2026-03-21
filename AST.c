@@ -7,7 +7,9 @@ Node* CreateNode(char* val, NodeType type){
     Node* node = (Node*)malloc(sizeof(Node));
     node->val = strdup(val);
     node->type = type;
-    node->left = NULL;    node->right = NULL;    node->next =NULL;
+    node->left = NULL;    
+    node->right = NULL;    
+    node->next =NULL;
     return node;
 }
 

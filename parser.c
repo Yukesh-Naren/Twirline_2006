@@ -2,6 +2,7 @@
 #include "include/parser.h"
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 int current = 0;
 Token* current_token;
 
@@ -44,7 +45,7 @@ Node* parse_declaration(){
     char* var_name = current_token->lexeme;
     match(ID);
     match(LP);
-    char* type_name;
+        char* type_name;
     if (current_token->type == INT) {
         type_name = "int";
         match(INT);
@@ -59,7 +60,7 @@ Node* parse_declaration(){
     if(current_token->type == SEMI){
         Node* n = CreateNode("Declaration",NODE_DECL);
         n->left = CreateNode(var_name, NODE_ID);
-        n->left->left = CreateNode("int",NODE_TYPE);
+        n->left->left = CreateNode(type_name,NODE_TYPE);
         return n;
     }
     else if(current_token->type == ASSIGN){
@@ -79,7 +80,7 @@ Node* parse_fact(){
     }
 
     if(current_token->type == NUM ){
-        Node* node =CreateNode(current_token->lexeme,NODE_INT_LITERAL);
+        Node* node =CreateNode(current_token->lexeme,NODE_CONST);
         advance();
         return node;
     }
@@ -97,7 +98,7 @@ Node* parse_term(){
     Node* left = parse_fact();
 
     while(current_token->type == DIV || current_token->type == MUL || current_token->type == MOD){
-        char *op = current_token->lexeme;
+        char *op = strdup(current_token->lexeme);
         advance();
 
         Node* right = parse_fact();
@@ -114,7 +115,7 @@ Node* parse_expr(){
     Node* left = parse_term();
 
     while(current_token->type == ADD || current_token->type == SUB){
-        char *op = current_token->lexeme;
+        char *op = strdup(current_token->lexeme);
         advance();
 
         Node* right = parse_term();
@@ -147,7 +148,7 @@ Node* parse_relation(){
     Node* left = parse_expr();
     while(current_token->type == LT || current_token->type == GT || current_token->type == LE || current_token->type == GE ){
         
-        char *op = current_token->lexeme;
+        char *op = strdup(current_token->lexeme);
         advance();
         Node* right =parse_expr();
 
@@ -167,7 +168,7 @@ Node* parse_assign(){
         }
         // printf("Parsing Assignment...\n");
         if((current+1)<tokencount && tokens[current+1]->type == ASSIGN){
-            char* name = current_token->lexeme;
+            char* name = strdup(current_token->lexeme);
             advance();
             match(ASSIGN);
 
