@@ -40,7 +40,7 @@ int main()
     printf("\nRunning Semantic Analysis...\n");
 
     check_semantics(root);
-
+    print_symbol_table();
     printf("\nSemantic Analysis Completed Successfully\n");
     freeAST(root);
 }
