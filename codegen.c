@@ -14,7 +14,13 @@ void generate_riscv_instruction(TAC* temp){
         printf("    sw t0, %s\n",temp->result);
         return;
     }
-
+    if (strcmp(temp->op,"!") == 0)
+    {
+        printf("    lw t0, %s\n",temp->arg1);
+        printf("    seqz t1, t0\n");
+        printf("    sw t1, %s\n",temp->result);
+        return;
+    }
     printf("    lw t0, %s\n",temp->arg1);
     printf("    lw t1, %s\n",temp->arg2);
     
@@ -26,6 +32,44 @@ void generate_riscv_instruction(TAC* temp){
     printf("    mul t2, t0, t1\n");
     else if(strcmp(temp->op,"%") == 0)
     printf("    rem t2, t0, t1\n");
+    else if(strcmp(temp->op,"<=") == 0){
+        printf("    sle t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,">=") == 0){
+        printf("    sge t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,"<") == 0){
+        printf("    slt t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,">") == 0){
+        printf("    sgt t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,"==") == 0){
+        printf("    sub t2, t0, t1\n");
+        printf("    seqz t2, t2\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,"!=") == 0){
+        printf("    sle t2, t0, t1\n");
+        printf("    snez t2, t2\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,"&&") == 0){
+        printf("    snez t0, t0\n");
+        printf("    snez t1, t1\n", temp->result);
+        printf("    and t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
+    else if(strcmp(temp->op,"||") == 0){
+        printf("    snez t0, t0\n");
+        printf("    snez t1, t1\n", temp->result);
+        printf("    or t2, t0, t1\n");
+        printf("    sw t2, %s\n", temp->result);
+    }
     else
     {
         printf(" # Unknown operator %s \n",temp->op);

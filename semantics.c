@@ -107,6 +107,10 @@ int evaluate_expression(Node* root)
 
     if (root->type == NODE_OP)
     {
+        if(strcmp(root->val, "!") == 0){
+            int val = evaluate_expression(root->left);
+            return !val;
+    }
         int leftVal = evaluate_expression(root->left);
         int rightVal = evaluate_expression(root->right);
 
@@ -132,6 +136,30 @@ int evaluate_expression(Node* root)
                 semanticError("Modulo by zero");
             return leftVal % rightVal;
         }
+
+        else if (strcmp(root->val, "<=") == 0)
+        return leftVal <= rightVal;
+
+        else if (strcmp(root->val, ">=") == 0)
+        return leftVal >= rightVal;
+
+        else if (strcmp(root->val, "<") == 0)
+        return leftVal < rightVal;
+
+        else if (strcmp(root->val, ">") == 0)
+        return leftVal > rightVal;
+
+        else if (strcmp(root->val, "==") == 0)
+        return leftVal == rightVal;
+
+        else if (strcmp(root->val, "!=") == 0)
+        return leftVal != rightVal;
+
+        else if (strcmp(root->val, "&&") == 0)
+        return leftVal && rightVal;
+
+        else if (strcmp(root->val, "||") == 0)
+        return leftVal || rightVal;
 
         else
         {
