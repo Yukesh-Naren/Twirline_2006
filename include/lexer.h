@@ -21,12 +21,17 @@ typedef enum {
     NE,     // !=
     NUM,    // numbers
     ID,     // identifier
+<<<<<<< HEAD
     INT,     // integer
     FLOAT,
+=======
+    INT,    // Interger
+    FLOAT   // floating point
+>>>>>>> bc47f11a1d216f7484fb1230a4a5586689642f57
 }Tokentype;
 
 typedef struct {
-    char lexeme[50];
+    char lexeme[64];
     Tokentype type;
 }Token;
 

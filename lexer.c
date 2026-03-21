@@ -15,7 +15,8 @@ Token* CreateToken(Tokentype type, char *lexeme){
     Token *t =(Token*)malloc(sizeof(Token));
 
     t->type = type;
-    strcpy(t->lexeme,lexeme);
+    strncpy(t->lexeme,lexeme,63);
+    t->lexeme[63] = '\0';
     return t;
 }
 
@@ -28,6 +29,8 @@ void addToken(Token *t)
     }
     
     tokens[tokencount++] = t;
+
+    printf("TOKEN[%d]: '%s'\n", tokencount, t->lexeme);
 }
 
 
@@ -158,16 +161,13 @@ void GetNextToken(FILE* fp)
             do{
                 if(ch == '.'){
                     c+=1;
-                    if(!isdigit(getc(fp))){
-                        
-                        break;
-                    }
                 }
                 buffer[j++] = ch;
                 ch = fgetc(fp);
             }while(isdigit(ch) || (ch=='.' && c == 0));
 
             buffer[j]='\0';
+            if(ch != EOF)
             ungetc(ch,fp);
             Token *t = CreateToken(NUM, buffer);
             addToken(t);
@@ -190,7 +190,7 @@ void GetNextToken(FILE* fp)
                 Token *t = CreateToken(INT , buffer);
                 addToken(t);
                 continue;
-            }else if(strcmp(buffer, "float") == 0) {
+                }else if(strcmp(buffer, "float") == 0) {
                 Token *t=CreateToken(FLOAT, buffer);
                 addToken(t);
                 continue;

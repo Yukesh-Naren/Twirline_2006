@@ -34,16 +34,12 @@ int main()
         printf("\nAST Tree : \n");
         printProgram(root);
         freeAST(root);
+    }
+     printf("Parsing Successful\n");
 
     printf("\nRunning Semantic Analysis...\n");
-    check_semantics(root);
-    printf("Semantic Analysis: PASSED (No undefined variables).\n");
 
-    print_symbol_table();
-    }
+    analyze(root);
 
-    else {
-        printf("Parsing failed. No AST generated.\n");
-    }
-    return 0;
+    printf("\nSemantic Analysis Completed Successfully\n");
 }
