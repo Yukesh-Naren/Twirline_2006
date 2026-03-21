@@ -33,13 +33,14 @@ int main()
     if(root!=NULL){
         printf("\nAST Tree : \n");
         printProgram(root);
-        freeAST(root);
+        
     }
      printf("Parsing Successful\n");
 
     printf("\nRunning Semantic Analysis...\n");
 
-    analyze(root);
+    check_semantics(root);
 
     printf("\nSemantic Analysis Completed Successfully\n");
+    freeAST(root);
 }

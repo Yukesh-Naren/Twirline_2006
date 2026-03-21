@@ -2,6 +2,6 @@ x(int);
 t(int) = 5;
 o(int) = 9 * t + 2;
 
-a = t + o;
-b = a * 2;
-c = b + o;
+a(int) = t + o; 
+b(int) = a * 2; 
+c(int) = b + o;  
