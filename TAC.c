@@ -41,7 +41,7 @@ char* newTemp(){
     static char temp[20];
     char* name = (char*)malloc(20);
 
-    sprintf(temp,"t%d",tempcount++);
+    sprintf(temp,"tmp%d",tempcount++);
     strcpy(name, temp);
 
     return name;
@@ -65,6 +65,13 @@ char* generateTAC(Node* root){
     }
     else if(root->type == NODE_OP)
     {
+        if (strcmp(root->val, "!") == 0)
+        {
+            char* operand = generateTAC(root->left);
+            char* temp = newTemp();
+            appendTAC(CreateTAC(temp, operand, "!", ""));
+            return temp;
+        }
         char* left = generateTAC(root->left);
         char* right = generateTAC(root->right);
 
@@ -98,7 +105,9 @@ void print_TAC(){
 
     while (temp!=NULL)
     {
-        if(strcmp(temp->op,"=") == 0)
+        if(strcmp(temp->op, "!") == 0)
+        printf("%s = ! %s\n", temp->result, temp->arg1);
+        else if(strcmp(temp->op,"=") == 0)
         printf("%s = %s\n",temp->result, temp->arg1);
         else
         printf("%s = %s %s %s \n",temp->result,temp->arg1,temp->op,temp->arg2);
