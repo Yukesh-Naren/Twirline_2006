@@ -230,7 +230,27 @@ void GetNextToken(FILE* fp)
                 continue;
             }
             else if(strcmp(buffer,"end") == 0){
-                Token *t = CreateToken(START , buffer);
+                Token *t = CreateToken(END , buffer);
+                addToken(t);
+                continue;   
+            }
+            else if(strcmp(buffer,"if") == 0){
+                Token *t = CreateToken(IF , buffer);
+                addToken(t);
+                continue;   
+            }
+            else if(strcmp(buffer,"else") == 0){
+                Token *t = CreateToken(ELSE , buffer);
+                addToken(t);
+                continue;   
+            }
+            else if(strcmp(buffer,"while") == 0){
+                Token *t = CreateToken(WHILE , buffer);
+                addToken(t);
+                continue;   
+            }
+            else if(strcmp(buffer,"elif") == 0){
+                Token *t = CreateToken(ELIF , buffer);
                 addToken(t);
                 continue;   
             }

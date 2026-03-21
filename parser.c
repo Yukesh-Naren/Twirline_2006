@@ -58,6 +58,7 @@ Node* parse_declaration(){
     }
     match(RP);
     if(current_token->type == SEMI){
+        match(SEMI);
         Node* n = CreateNode("Declaration",NODE_DECL);
         n->left = CreateNode(var_name, NODE_ID);
         n->left->left = CreateNode(type_name,NODE_TYPE);
@@ -231,20 +232,135 @@ Node* parse_assign(){
 }
 
 Node* parse_expr(){
-    return parse_logical_or();
+    return parse_assign();
+}
+
+Node* parse_if(){
+    match(IF);
+    match(LP);
+
+    Node* condNode = parse_logical_or();
+
+    match(RP);
+    Node* thenNode = NULL;
+    Node* elseNode = NULL;
+    if(current_token->type == START){
+        match(START);
+        thenNode = parse_stmt_list();
+        match(END);
+    }
+    else
+    {
+        thenNode = parse_statement();
+        match(SEMI);
+    }
+    Node* ifNode = CreateNode("if",NODE_IF);
+    ifNode->left = condNode;
+    ifNode->right = thenNode;
+
+    Node* currentIf = ifNode;
+
+    while(current_token->type == ELIF)
+    {
+        match(ELIF);
+        match(LP);
+
+        Node* elifCond = parse_logical_or();
+        match(RP);
+
+        Node* elifThen = NULL;
+        if(current_token->type == START){
+                match(START);
+                elifThen = parse_stmt_list();
+                match(END);
+        }
+        else{
+            elifThen = parse_assign();
+            match(SEMI);
+        }
+
+        Node* elifNode = CreateNode("if", NODE_IF);
+        elifNode->left = elifCond;
+        elifNode->right = elifThen;
+
+        Node* elseWrap = CreateNode("else", NODE_ELSE);
+        elseWrap->left = currentIf->right;
+        elseWrap->right = elifNode;
+
+        currentIf->right = elseWrap;
+        currentIf = elifNode;
+    }
+
+        if(current_token->type == ELSE){
+            match(ELSE);
+
+            Node* elseNode = NULL;
+
+            if(current_token->type == START){
+                match(START);
+                elseNode = parse_stmt_list();
+                match(END);
+            }
+
+            else{
+                elseNode = parse_assign();
+                match(SEMI);
+            }
+        
+
+        Node* elseWrap = CreateNode("else",NODE_ELSE);
+        elseWrap->left = currentIf->right;
+        elseWrap->right = elseNode;
+
+        currentIf->right = elseWrap;
+        }
+
+        return ifNode;
 }
 Node* parse_statement(){
-    Node* stmt = parse_assign();
-
-    if(current_token->type != SEMI){
+    if(current_token->type == ID){
+        return parse_assign();
+    }
+    else if(current_token->type == IF){
+        return parse_if();
+    }
+    // else if(current_token->type == WHILE){
+    //     return parse_while();
+    // }
+    else if(current_token->type == START){
+        match(START);
+        Node* block = parse_stmt_list();
+        match(END);
+        return block;
+    }
+    else if(current_token->type == SEMI){
+        advance();
+        return NULL;
+    }
         printf("Error near token: %s\n", current_token->lexeme);
         printf("Syntax Error: Expected ';'\n");
         exit(1);
+}
+
+Node* parse_stmt_list(){
+    Node* head = NULL;
+    Node* tail =NULL;
+    while(current_token->type != END && current_token->type !=EOI){
+        Node* stmtNode = parse_statement();
+        if(stmtNode == NULL) continue;
+        stmtNode->next = NULL;
+        
+        if(head==NULL){
+            head = stmtNode;
+            tail = stmtNode;
+        }
+        else{
+            tail->next = stmtNode;
+            tail = stmtNode;
+        }
     }
 
-    advance();
-
-    return stmt;
+    return head;
 }
 
 Node* parse_program(){

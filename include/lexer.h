@@ -27,7 +27,11 @@ typedef enum {
     INT,    // Interger
     FLOAT,  // floating point
     START,  // START
-    END     // END 
+    END ,   // END 
+    IF,     // if (keyword)
+    ELSE,   // else (keyword)
+    ELIF,   // elif (keyword)
+    WHILE,  // while (keyword)
 }Tokentype;
 
 typedef struct {

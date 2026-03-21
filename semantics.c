@@ -223,6 +223,8 @@ void check_semantics(Node* root)
         {
             evaluate_expression(current);
         }
+        else if (current->type == NODE_IF)
+        check_if(current);
         else
         {
             evaluate_expression(current);
@@ -231,4 +233,38 @@ void check_semantics(Node* root)
         current = current->next;
     }
 
+}
+
+void check_if(Node* node)
+{
+    if(node == NULL) return;
+
+    int cond = evaluate_expression(node->left);
+
+    if(node->right == NULL) return;
+
+    if(node->right->type == NODE_ELSE)
+    {
+        Node* elseWrap = node->right;
+
+        if(cond)
+        {
+            check_semantics(elseWrap->left);
+        }
+        else
+        {
+            if(elseWrap->right != NULL)
+            {
+                if(elseWrap->right->type == NODE_IF)
+                    check_if(elseWrap->right);
+                else
+                    check_semantics(elseWrap->right);
+            }
+        }
+    }
+    else
+    {
+        if(cond)
+            check_semantics(node->right);
+    }
 }

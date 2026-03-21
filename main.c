@@ -49,7 +49,7 @@ int main()
     Node* current = root;
     while (current != NULL)
     {
-        generateTAC(current);
+        generate_TAC(current);
         current = current->next;
     }
     print_TAC();
