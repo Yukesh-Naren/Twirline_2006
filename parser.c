@@ -78,7 +78,16 @@ Node* parse_fact(){
         advance();
         return node;
     }
+    if(current_token->type == NOT){
+        advance();
 
+        Node* operand = parse_fact();
+        Node* node = CreateNode("!",NODE_OP);
+        node->left = operand;
+        node->right = NULL;
+
+        return node;
+    }
     if(current_token->type == NUM ){
         Node* node =CreateNode(current_token->lexeme,NODE_CONST);
         advance();
@@ -111,7 +120,7 @@ Node* parse_term(){
     return left;
 }
 
-Node* parse_expr(){
+Node* parse_additive(){
     Node* left = parse_term();
 
     while(current_token->type == ADD || current_token->type == SUB){
@@ -128,29 +137,13 @@ Node* parse_expr(){
     return left;
 }
 
-Node* parse_equal(){
-    Node* left = parse_relation();
-
-    while(current_token->type == EQ){
-        advance();
-
-        Node* right = parse_relation();
-        Node* node = CreateNode("==",NODE_OP);
-        node->left = left;
-        node->right = right;
-
-        left = node;
-    }
-    return left;
-}
-
 Node* parse_relation(){
-    Node* left = parse_expr();
+    Node* left = parse_additive();
     while(current_token->type == LT || current_token->type == GT || current_token->type == LE || current_token->type == GE ){
         
         char *op = strdup(current_token->lexeme);
         advance();
-        Node* right =parse_expr();
+        Node* right =parse_additive();
 
         Node* node = CreateNode(op,NODE_OP);
         node->left = left;
@@ -161,6 +154,60 @@ Node* parse_relation(){
     return left;
 }
 
+Node* parse_equal(){
+    Node* left = parse_relation();
+    while(current_token->type == EQ || current_token->type == NE){
+        
+        char *op = strdup(current_token->lexeme);
+        advance();
+        Node* right =parse_relation();
+
+        Node* node = CreateNode(op,NODE_OP);
+        node->left = left;
+        node->right = right;
+
+        left = node;
+    }
+    return left;
+}
+
+Node* parse_logical_and(){
+    Node* left = parse_equal();
+    
+    while(current_token->type == AND)
+    {
+        char* op = strdup(current_token->lexeme);
+        advance();
+
+        Node* right = parse_equal();
+        Node* node = CreateNode(op,NODE_OP);
+        node->left = left;
+        node->right = right;
+
+        left = node;
+    }
+
+    return left;
+}
+
+Node* parse_logical_or(){
+    Node* left = parse_logical_and();
+    
+    while(current_token->type == OR)
+    {
+        char* op = strdup(current_token->lexeme);
+        advance();
+
+        Node* right = parse_logical_and();
+        Node* node = CreateNode(op,NODE_OP);
+        node->left = left;
+        node->right = right;
+
+        left = node;
+    }
+
+    return left;
+}
 Node* parse_assign(){
     if(current_token->type == ID){
         if((current+1)<tokencount && tokens[current+1]->type == LP){
@@ -177,14 +224,15 @@ Node* parse_assign(){
             Node* node = CreateNode("=",NODE_ASSIGN);
             node->left = CreateNode(name,NODE_ID);
             node->right = right;
-//             printf("LEFT: %s\n", node->left ? node->left->val : "NULL");
-// printf("RIGHT: %s\n", node->right ? node->right->val : "NULL");
             return node;
         }
     }
-    return parse_equal();
+    return parse_logical_or();
 }
 
+Node* parse_expr(){
+    return parse_logical_or();
+}
 Node* parse_statement(){
     Node* stmt = parse_assign();
 

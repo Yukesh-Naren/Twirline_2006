@@ -1,7 +1,5 @@
-x(int);
-t(int) = 5;
-o(int) = 9 * t + 2;
-
-a(int) = t + o; 
-b(int) = a * 2; 
-c(int) = b + o;  
+a(int)=5;
+b(int)=10;
+c(int)=a<b;
+d(int)=a<b && b!=0;
+e(int)=!(a==b);

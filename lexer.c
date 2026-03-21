@@ -143,14 +143,39 @@ void GetNextToken(FILE* fp)
 
         else if(ch == '!')
         {
+            
             int next = fgetc(fp);
             if(next == '=')
             {
                 Token* t = CreateToken(NE,"!=");
                 addToken(t);
             }
-            else
-            ungetc(next,fp);
+            else{
+                Token* t = CreateToken(NOT, "!");
+                addToken(t);
+                ungetc(next,fp);
+            }
+        }
+        else if (ch == '&') {
+            char next = fgetc(fp);
+            if (next == '&') {
+                Token* t = CreateToken(AND, "&&");
+                addToken(t);
+            } else {
+                printf("Lexical Error: unexpected '&'\n");
+                exit(1);
+            }
+        }
+
+        else if (ch == '|') {
+            char next = fgetc(fp);
+            if (next == '|') {
+                Token* t = CreateToken(OR, "||");
+                addToken(t);
+            } else {
+                printf("Lexical Error: unexpected '|'\n");
+                exit(1);
+            }
         }
 
         else if(isdigit(ch) || ch == '.')
@@ -198,6 +223,16 @@ void GetNextToken(FILE* fp)
                 Token *t=CreateToken(FLOAT, buffer);
                 addToken(t);
                 continue;
+            }
+            else if(strcmp(buffer,"start") == 0){
+                Token *t = CreateToken(START , buffer);
+                addToken(t);
+                continue;
+            }
+            else if(strcmp(buffer,"end") == 0){
+                Token *t = CreateToken(START , buffer);
+                addToken(t);
+                continue;   
             }
             Token *t = CreateToken(ID , buffer);
             addToken(t);

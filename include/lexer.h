@@ -19,10 +19,15 @@ typedef enum {
     GE,     // >=
     EQ,     // ==
     NE,     // !=
+    AND,    // &
+    OR,     // ||
+    NOT,    // !
     NUM,    // numbers
     ID,     // identifier
     INT,    // Interger
-    FLOAT   // floating point
+    FLOAT,  // floating point
+    START,  // START
+    END     // END 
 }Tokentype;
 
 typedef struct {

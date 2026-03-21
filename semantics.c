@@ -203,6 +203,4 @@ void check_semantics(Node* root)
         current = current->next;
     }
 
-    printf("Semantic Analysis Successful\n");
-    print_symbol_table();
 }
