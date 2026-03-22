@@ -21,7 +21,9 @@ char* getLeafType(Node* node);
 char* checkOpType(char* left, char* right, char* op);
 void semanticError(const char *msg);
 void check_if(Node* node);
-
+void check_while(Node* node);
+void check_print(Node* node);
+void check_input(Node* node);
 void add_symbol(char* name, int init);
 Symbol* lookup_symbol(char* name);
 void print_symbol_table();

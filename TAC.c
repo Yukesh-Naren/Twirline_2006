@@ -78,6 +78,26 @@ void emit_label(char* label)
     appendTAC(CreateTAC(label, "", "label", ""));
 }
 
+void generate_print(Node* node)
+{
+    if(node == NULL) return;
+
+    Node* arg = node ->left;
+
+    while(arg !=NULL)
+    {
+
+    if(arg->type == NODE_STRING)
+    {
+        appendTAC(CreateTAC("print",arg->val,"",""));
+    }
+    else{
+            char* value = generate_expr(arg);
+            appendTAC(CreateTAC("print",value,"",""));
+    }
+    arg = arg ->next;
+    }
+}
 
 char* generate_expr(Node* root)
 {
@@ -124,6 +144,29 @@ void generate_assign(Node* node)
 
     char* rhs = generate_expr(node->right);
     appendTAC(CreateTAC(node->left->val, rhs, "=", ""));
+}
+
+void generate_while(Node* node){
+    if(node == NULL) return;
+    char* startLabel = new_label();
+    char* trueLabel  = new_label();
+    char* endLabel   = new_label();
+
+    emit_label(startLabel);
+
+    char* cond = generate_expr(node->left);
+
+    emit_if_goto(cond, trueLabel);
+    emit_goto(endLabel);
+
+    emit_label(trueLabel);
+
+    if(node->right!=NULL)
+    generate_stmt_list(node->right);
+
+    emit_goto (startLabel);
+
+    emit_label(endLabel);
 }
 
 void generate_if(Node* node)
@@ -187,6 +230,18 @@ void generate_stmt(Node* node)
         case NODE_IF:
             generate_if(node);
             break;
+        
+        case NODE_WHILE:
+            generate_while(node);
+            break;
+
+        case NODE_PRINT:
+            generate_print(node);
+            break;
+
+        case NODE_INPUT:
+            generate_input(node);
+            break;
 
         default:
             generate_expr(node);
@@ -194,6 +249,10 @@ void generate_stmt(Node* node)
     }
 }
 
+void generate_input(Node* node){
+    if(node == NULL || node->left == NULL) return;
+    appendTAC(CreateTAC("input",node->left->val,"",""));
+}
 void generate_stmt_list(Node* node)
 {
     Node* curr = node;
@@ -229,6 +288,12 @@ void print_TAC()
         else if(strcmp(temp->op, "label") == 0)
             printf("%s:\n", temp->result);
 
+        else if(strcmp(temp->result,"print") == 0)
+            printf("print %s \n", temp->arg1);
+
+        else if(strcmp(temp->result,"input") == 0)
+            printf("input %s\n",temp->arg1);
+            
         else if(strcmp(temp->op, "!") == 0)
             printf("%s = ! %s\n", temp->result, temp->arg1);
 

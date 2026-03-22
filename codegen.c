@@ -12,6 +12,9 @@ extern TAC* tacTail;
 static char vars[MAX_VARS][50];
 static int varCount = 0;
 
+static char strings[MAX_VARS][50];
+static int stringCount = 0;
+
 /* ---------------- HELPERS ---------------- */
 
 int is_number(const char* s) {
@@ -47,17 +50,22 @@ void collect_variables() {
     TAC* temp = tacHead;
 
     while (temp != NULL) {
-        /* if cond goto L1 */
+        // if cond goto L1  
         if (strcmp(temp->result, "if") == 0 && strcmp(temp->op, "goto") == 0) {
             add_var(temp->arg1);
         }
-        /* goto L1 */
+        // goto L1 
         else if (strcmp(temp->result, "goto") == 0) {
             /* nothing */
         }
-        /* label */
+        // label 
         else if (strcmp(temp->op, "label") == 0) {
             /* nothing */
+        }
+        //string
+        else if (strcmp(temp->result, "print") == 0) {
+            if (!is_number(temp->arg1) && !exists_var(temp->arg1))
+                add_string(temp->arg1);
         }
         else {
             add_var(temp->result);
@@ -72,8 +80,25 @@ void collect_variables() {
 void load_operand(const char* op, const char* reg) {
     if (is_number(op))
         printf("    li %s, %s\n", reg, op);
-    else
-        printf("    lw %s, %s\n", reg, op);
+    else{
+        printf("    la t3, %s\n", op);
+        printf("    lw %s, 0(t3)\n", reg);
+    }
+}
+
+int exists_string(const char* s) {
+    for (int i = 0; i < stringCount; i++) {
+        if (strcmp(strings[i], s) == 0) return i;
+    }
+    return -1;
+}
+
+int add_string(const char* s) {
+    int idx = exists_string(s);
+    if (idx != -1) return idx;
+
+    strcpy(strings[stringCount], s);
+    return stringCount++;
 }
 
 /* ---------------- ONE TAC INSTRUCTION ---------------- */
@@ -81,41 +106,70 @@ void load_operand(const char* op, const char* reg) {
 void generate_riscv_instruction(TAC* temp) {
     if (temp == NULL) return;
 
-    /* if cond goto L1 */
+    
+    // if goto
     if (strcmp(temp->result, "if") == 0 && strcmp(temp->op, "goto") == 0) {
         load_operand(temp->arg1, "t0");
         printf("    bne t0, x0, %s\n", temp->arg2);
         return;
     }
 
-    /* goto L1 */
+    // goto  
     if (strcmp(temp->result, "goto") == 0) {
         printf("    j %s\n", temp->arg1);
         return;
     }
 
-    /* label */
+    // label
     if (strcmp(temp->op, "label") == 0) {
         printf("%s:\n", temp->result);
         return;
     }
 
-    /* assignment */
+    // assignment 
     if (strcmp(temp->op, "=") == 0) {
         load_operand(temp->arg1, "t0");
-        printf("    sw t0, %s\n", temp->result);
+        printf("    la t3 ,%s\n", temp->result);
+        printf("    sw t0, 0(t3)\n");
         return;
     }
+    //input
+    if(strcmp(temp->result,"input") == 0){
+        printf("    li a7,5\n");
+        printf("    ecall\n");
+        printf("    la t3,%s\n",temp->arg1);
+        printf("    sw a0, 0(t3)\n");
+        return;
+    }
+    //print
+    if (strcmp(temp->result, "print") == 0) {
 
-    /* unary not */
+        int idx = exists_string(temp->arg1);
+        // STRING
+        if (idx != -1) {
+            printf("    la a0, str%d\n", idx);   
+            printf("    li a7, 4\n");
+            printf("    ecall\n");
+        }
+        else {
+            // NUMBER or VARIABLE
+            load_operand(temp->arg1, "a0");
+            printf("    li a7, 1\n");
+            printf("    ecall\n");
+        }
+
+        return;
+    }
+    // unary not 
     if (strcmp(temp->op, "!") == 0) {
         load_operand(temp->arg1, "t0");
         printf("    seqz t1, t0\n");
-        printf("    sw t1, %s\n", temp->result);
+        printf("    la t3 ,%s\n", temp->result);
+        printf("    sw t1, 0(t3)\n");
         return;
     }
 
-    /* binary ops */
+    // binary ops 
     load_operand(temp->arg1, "t0");
     load_operand(temp->arg2, "t1");
 
@@ -171,10 +225,11 @@ void generate_riscv_instruction(TAC* temp) {
         return;
     }
 
-    printf("    sw t2, %s\n", temp->result);
+    printf("    la t3 ,%s\n", temp->result);
+    printf("    sw t2, 0(t3)\n");
 }
 
-/* ---------------- FULL CODEGEN ---------------- */
+//Code Generation
 
 void generate_riscv_code() {
     TAC* temp;
@@ -184,6 +239,10 @@ void generate_riscv_code() {
 
     printf("\n========= RISC-V CODE =======\n");
     printf(".data\n");
+
+    for (int i = 0; i < stringCount; i++) {
+    printf("str%d: .asciz \"%s\"\n", i, strings[i]);
+    }
 
     for (int i = 0; i < varCount; i++) {
         printf("%s: .word 0\n", vars[i]);

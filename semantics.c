@@ -177,7 +177,7 @@ int evaluate_expression(Node* root)
         if (sym == NULL)
         {
             char msg[100];
-            sprintf(msg, "Variable '%s' not declared", root->left->val);
+            snprintf(msg,sizeof(msg), "Variable '%s' not declared", root->left->val);
             semanticError(msg);
         }
 
@@ -198,7 +198,6 @@ int evaluate_expression(Node* root)
 void check_semantics(Node* root)
 {
     Node* current = root;
-
     while (current != NULL)
     {
         if (current->type == NODE_DECL)
@@ -223,8 +222,19 @@ void check_semantics(Node* root)
         {
             evaluate_expression(current);
         }
+
         else if (current->type == NODE_IF)
         check_if(current);
+        
+        else if (current->type == NODE_WHILE)
+        check_while(current);
+
+        else if (current->type == NODE_PRINT)
+        check_print(current);
+
+        else if(current->type == NODE_INPUT)
+        check_input(current);
+
         else
         {
             evaluate_expression(current);
@@ -235,10 +245,28 @@ void check_semantics(Node* root)
 
 }
 
+void check_print(Node* node)
+{
+    if(node == NULL) {
+        semanticError("Invalid print statement");
+        return;
+    }
+
+    Node* arg = node->left;
+
+    if (arg == NULL){
+        semanticError("print has no arguments");
+        return;
+    }
+    while(arg != NULL){
+        if(arg->type != NODE_STRING)
+        evaluate_expression(arg);
+        arg = arg->next;
+    }
+}
 void check_if(Node* node)
 {
-    if(node == NULL) return;
-
+    
     int cond = evaluate_expression(node->left);
 
     if(node->right == NULL) return;
@@ -267,4 +295,30 @@ void check_if(Node* node)
         if(cond)
             check_semantics(node->right);
     }
+}
+
+void check_while(Node* node)
+{
+    if (node == NULL) return;
+    if (node ->left == NULL){
+        semanticError("while condition missing!");
+        return;
+    }
+    while(evaluate_expression(node->left)){
+        check_semantics(node->right);
+    }
+}
+
+void check_input(Node* node)
+{
+    if(node == NULL || node->left == NULL || node->left->type != NODE_ID)
+    semanticError("Invalid input statement");
+
+    Symbol* sym = lookup_symbol(node->left->val);
+    if(sym == NULL){
+        char msg[100];
+        sprintf(msg, "Variable '%s' not declared", node->left->val);
+        semanticError(msg);
+    }
+    sym->is_init = 1;
 }

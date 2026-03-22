@@ -235,6 +235,66 @@ Node* parse_expr(){
     return parse_assign();
 }
 
+Node* parse_print(){
+    match(PRINT);
+    match(LP);
+
+    Node* head = NULL;
+    Node* tail = NULL;
+
+    while(1){
+        Node* print = NULL;
+        if(current_token->type == STRING){
+            print = CreateNode(current_token->lexeme,NODE_STRING);
+            match(STRING);
+        }
+        else 
+        print = parse_expr();
+        
+        if(head == NULL){
+            head=tail=print;
+        }
+        else{
+            tail->next = print;
+            tail = print;
+        }
+
+        if(current_token->type == COMMA)
+        match(COMMA);
+        else
+        break;
+    }
+    match(RP);
+    match(SEMI);
+
+    Node* node = CreateNode("print", NODE_PRINT);
+    node->left = head;
+
+    Node* temp = head;
+    // while(temp !=NULL){
+    //     printf("PRINT ARG: %s type = %d\n",temp->val, temp->type);
+    //     temp= temp->next;
+    // }
+    return node;
+}
+
+Node* parse_input_stmt()
+{
+    match(INPUT);
+    match(LP);
+
+    Node* idNode = CreateNode( current_token->lexeme, NODE_ID);
+    advance();
+
+    match(RP);
+    match(SEMI);
+
+    Node* inNode = CreateNode( "input" , NODE_INPUT);
+    inNode->left = idNode;
+
+    return inNode;
+}
+
 Node* parse_if(){
     match(IF);
     match(LP);
@@ -324,9 +384,12 @@ Node* parse_statement(){
     else if(current_token->type == IF){
         return parse_if();
     }
-    // else if(current_token->type == WHILE){
-    //     return parse_while();
-    // }
+    else if(current_token->type == WHILE){
+        return parse_while();
+    }
+    else if(current_token->type == PRINT){
+        return parse_print();
+    }
     else if(current_token->type == START){
         match(START);
         Node* block = parse_stmt_list();
@@ -337,11 +400,40 @@ Node* parse_statement(){
         advance();
         return NULL;
     }
+    else if(current_token->type == INPUT){
+        return parse_input_stmt();
+    }
         printf("Error near token: %s\n", current_token->lexeme);
         printf("Syntax Error: Expected ';'\n");
         exit(1);
 }
 
+Node* parse_while() {
+    match(WHILE); 
+    match(LP);    
+
+    Node* condNode = parse_logical_or(); 
+    match(RP);    
+
+    Node* bodyNode = NULL;
+
+    
+    if (current_token->type == START) {
+        match(START);
+        bodyNode = parse_stmt_list();
+        match(END);
+    } else {
+        bodyNode = parse_statement();
+        match(SEMI); 
+    }
+
+    
+    Node* whileNode = CreateNode("while", NODE_WHILE);
+    whileNode->left = condNode;  
+    whileNode->right = bodyNode;
+
+    return whileNode;
+}
 Node* parse_stmt_list(){
     Node* head = NULL;
     Node* tail =NULL;

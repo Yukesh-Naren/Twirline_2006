@@ -25,9 +25,12 @@ void emit_label(char* label);
 char* generate_expr(Node* root);
 void generate_assign(Node* node);
 void generate_if(Node* node);
+void generate_while(Node* node);
+void generate_print(Node* node);
 void generate_stmt(Node* node);
 void generate_stmt_list(Node* node);
 void generate_TAC(Node* root);
+void generate_input(Node* root);
 void print_TAC();
 
 #endif

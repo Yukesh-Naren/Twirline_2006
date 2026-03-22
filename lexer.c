@@ -79,10 +79,32 @@ void GetNextToken(FILE* fp)
             addToken(t);       
         }
 
+        else if( ch == ',')
+        {
+            Token *t = CreateToken(COMMA,",");
+            addToken(t);
+        }
+        
         else if(ch==')')
         {
             Token *t =CreateToken(RP, ")");
             addToken(t);       
+        }
+
+        else if( ch == '"')
+        {
+            char buffer[50];
+            int c=0;
+            int j=0;
+            ch = fgetc(fp);
+            while(ch!='"' && ch != EOF){
+                buffer[j++] = ch;
+                ch = fgetc(fp);
+            }
+            
+            buffer[j]='\0';
+            Token *t2 = CreateToken(STRING, buffer);
+            addToken(t2);
         }
 
         else if(ch == ';')
@@ -253,6 +275,17 @@ void GetNextToken(FILE* fp)
                 Token *t = CreateToken(ELIF , buffer);
                 addToken(t);
                 continue;   
+            }
+            else if (strcmp(buffer,"print") == 0){
+                Token *t = CreateToken(PRINT , buffer);
+                addToken(t);
+                continue;
+            }
+            else if (strcmp(buffer,"input") == 0)
+            {
+                Token *t = CreateToken(INPUT ,buffer);
+                addToken(t);
+                continue; 
             }
             Token *t = CreateToken(ID , buffer);
             addToken(t);

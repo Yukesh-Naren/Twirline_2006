@@ -20,15 +20,17 @@ void printAST(Node* root , int level){
     printf("  ");
 
     printf("|-- %s(type=%d)\n",root->val,root->type);
+    if(root->left)
     printAST(root ->left, level+1);
+    if(root->right)
     printAST(root->right , level+1);
+    if(root->next)
+    printAST(root->next , level);
 }
 void printProgram(Node* root){
-    while (root !=NULL){
         printAST(root , 0);
         printf("\n");
-        root = root->next;
-    }
+    
 }
     void freeAST(Node* root){
         if(root == NULL) return ;

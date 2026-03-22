@@ -32,6 +32,11 @@ typedef enum {
     ELSE,   // else (keyword)
     ELIF,   // elif (keyword)
     WHILE,  // while (keyword)
+    PRINT,  // print
+    DQ,     // "
+    STRING, // strings
+    COMMA,  // ,
+    INPUT,  // input
 }Tokentype;
 
 typedef struct {

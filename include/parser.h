@@ -22,5 +22,8 @@ Node* parse_logical_or();
 Node* parse_declaration();
 Node* parse_declaration_assignment(char* var_name);
 Node* parse_if();
+Node* parse_while();
 Node* parse_block();
+Node* parse_print();
+Node* parse_input_stmt();
 #endif
