@@ -1,12 +1,11 @@
 a(int);
 b(int);
 c(int);
-d(int);
+d(int) = 0;
 
 a=5;
 b=10;
 c=0;
-d=0;
 
 if(a<b) c=1;
 elif(a==b) c=2;

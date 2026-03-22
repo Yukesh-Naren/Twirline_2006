@@ -177,7 +177,7 @@ void generate_stmt(Node* node)
 
         case NODE_DECL_ASSN:
             if(node->left != NULL)
-                generate_assign(node->left);
+            generate_assign(node->left);
             break;
 
         case NODE_ASSIGN:

@@ -47,11 +47,8 @@ int main()
 
     printf("Starting TAC generation...\n");
     Node* current = root;
-    while (current != NULL)
-    {
-        generate_TAC(current);
-        current = current->next;
-    }
+    
+    generate_TAC(root);
     print_TAC();
     printf("\nThree Address Code is Successful");
     
