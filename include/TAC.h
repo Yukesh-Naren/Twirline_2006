@@ -8,6 +8,7 @@ typedef struct TAC {
     char arg1[20];
     char op[10];
     char arg2[20];
+    int type;
     struct TAC* next;
 }TAC;
 
@@ -21,7 +22,7 @@ char* new_label();
 void emit_if_goto(char* cond, char* label);
 void emit_goto(char* label);
 void emit_label(char* label);
-
+int get_expr_tpe(char* root);
 char* generate_expr(Node* root);
 void generate_assign(Node* node);
 void generate_if(Node* node);

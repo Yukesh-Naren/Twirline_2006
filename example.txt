@@ -1,7 +1,15 @@
-a(int);
-input(a);
+a(float);
+b(float);
+count(int);
 
-while(a > 0) start
-    print(a);
-    a = a - 1;
+input(a);
+input(b);
+count = 3;
+
+while(count > 0) start
+    a = a + b;
+    b = b + 1.5;
+    print(a,"\t");
+    print(b,"\t");
+    count = count - 1;
 end

@@ -3,6 +3,7 @@
 #include <string.h>
 #include "tac.h"
 #include "ast.h"
+#include "semantics.h"
 
 TAC* tacHead = NULL;
 TAC* tacTail = NULL;
@@ -10,7 +11,13 @@ TAC* tacTail = NULL;
 int tempcount = 1;
 int labelcount = 1;
 
-TAC* CreateTAC(char* result, char* arg1, char* op, char* arg2)
+int get_expr_type(Node* root);
+char* generate_expr(Node* root);
+void generate_stmt(Node* node);
+void generate_stmt_list(Node* node);
+void generate_input(Node* node);
+
+TAC* CreateTAC(char* result, char* arg1, char* op, char* arg2, int type)
 {
     TAC* node = (TAC*)malloc(sizeof(TAC));
 
@@ -27,6 +34,7 @@ TAC* CreateTAC(char* result, char* arg1, char* op, char* arg2)
     else
         node->arg2[0] = '\0';
 
+    node->type = type;
     node->next = NULL;
     return node;
 }
@@ -65,38 +73,76 @@ char* new_label()
 
 void emit_if_goto(char* cond, char* label)
 {
-    appendTAC(CreateTAC("if", cond, "goto", label));
+    appendTAC(CreateTAC("if", cond, "goto", label, TYPE_INT));
 }
 
 void emit_goto(char* label)
 {
-    appendTAC(CreateTAC("goto", label, "", ""));
+    appendTAC(CreateTAC("goto", label, "", "", TYPE_INT));
 }
 
 void emit_label(char* label)
 {
-    appendTAC(CreateTAC(label, "", "label", ""));
+    appendTAC(CreateTAC(label, "", "label", "", TYPE_INT));
 }
 
 void generate_print(Node* node)
 {
     if(node == NULL) return;
 
-    Node* arg = node ->left;
+    Node* arg = node->left;
 
-    while(arg !=NULL)
+    while(arg != NULL)
     {
-
-    if(arg->type == NODE_STRING)
-    {
-        appendTAC(CreateTAC("print",arg->val,"",""));
-    }
-    else{
+        if(arg->type == NODE_STRING)
+        {
+            appendTAC(CreateTAC("print", arg->val, "", "", TYPE_INT));
+        }
+        else
+        {
             char* value = generate_expr(arg);
-            appendTAC(CreateTAC("print",value,"",""));
+            appendTAC(CreateTAC("print", value, "", "", get_expr_type(arg)));
+        }
+        arg = arg->next;
     }
-    arg = arg ->next;
+}
+
+int get_expr_type(Node* root)
+{
+    if (root == NULL) return TYPE_INT;
+
+    if (root->type == NODE_CONST) {
+        if (strchr(root->val, '.') != NULL)
+            return TYPE_FLOAT;
+        return TYPE_INT;
     }
+
+    if (root->type == NODE_ID) {
+        return get_symbol_type(root->val);
+    }
+
+    if (root->type == NODE_ASSIGN) {
+        return get_symbol_type(root->left->val);
+    }
+
+    if (root->type == NODE_OP) {
+        if (!strcmp(root->val, "<")  || !strcmp(root->val, ">")  ||
+            !strcmp(root->val, "<=") || !strcmp(root->val, ">=") ||
+            !strcmp(root->val, "==") || !strcmp(root->val, "!=") ||
+            !strcmp(root->val, "&&") || !strcmp(root->val, "||") ||
+            !strcmp(root->val, "!")) {
+            return TYPE_INT;
+        }
+
+        int leftType = get_expr_type(root->left);
+        int rightType = get_expr_type(root->right);
+
+        if (leftType == TYPE_FLOAT || rightType == TYPE_FLOAT)
+            return TYPE_FLOAT;
+        return TYPE_INT;
+    }
+
+    return TYPE_INT;
 }
 
 char* generate_expr(Node* root)
@@ -115,7 +161,7 @@ char* generate_expr(Node* root)
         {
             char* operand = generate_expr(root->left);
             char* temp = newTemp();
-            appendTAC(CreateTAC(temp, operand, "!", ""));
+            appendTAC(CreateTAC(temp, operand, "!", "", TYPE_INT));
             return temp;
         }
 
@@ -123,7 +169,8 @@ char* generate_expr(Node* root)
         char* right = generate_expr(root->right);
 
         char* temp = newTemp();
-        appendTAC(CreateTAC(temp, left, root->val, right));
+        int exprType = get_expr_type(root);
+        appendTAC(CreateTAC(temp, left, root->val, right, exprType));
 
         return temp;
     }
@@ -131,7 +178,7 @@ char* generate_expr(Node* root)
     if(root->type == NODE_ASSIGN)
     {
         char* rhs = generate_expr(root->right);
-        appendTAC(CreateTAC(root->left->val, rhs, "=", ""));
+        appendTAC(CreateTAC(root->left->val, rhs, "=", "", get_symbol_type(root->left->val)));
         return strdup(root->left->val);
     }
 
@@ -143,11 +190,13 @@ void generate_assign(Node* node)
     if(node == NULL) return;
 
     char* rhs = generate_expr(node->right);
-    appendTAC(CreateTAC(node->left->val, rhs, "=", ""));
+    appendTAC(CreateTAC(node->left->val, rhs, "=", "", get_symbol_type(node->left->val)));
 }
 
-void generate_while(Node* node){
+void generate_while(Node* node)
+{
     if(node == NULL) return;
+
     char* startLabel = new_label();
     char* trueLabel  = new_label();
     char* endLabel   = new_label();
@@ -161,11 +210,10 @@ void generate_while(Node* node){
 
     emit_label(trueLabel);
 
-    if(node->right!=NULL)
-    generate_stmt_list(node->right);
+    if(node->right != NULL)
+        generate_stmt_list(node->right);
 
-    emit_goto (startLabel);
-
+    emit_goto(startLabel);
     emit_label(endLabel);
 }
 
@@ -209,6 +257,12 @@ void generate_if(Node* node)
     emit_label(endLabel);
 }
 
+void generate_input(Node* node)
+{
+    if(node == NULL || node->left == NULL) return;
+    appendTAC(CreateTAC("input", node->left->val, "", "", get_symbol_type(node->left->val)));
+}
+
 void generate_stmt(Node* node)
 {
     if(node == NULL) return;
@@ -220,7 +274,7 @@ void generate_stmt(Node* node)
 
         case NODE_DECL_ASSN:
             if(node->left != NULL)
-            generate_assign(node->left);
+                generate_assign(node->left);
             break;
 
         case NODE_ASSIGN:
@@ -230,7 +284,7 @@ void generate_stmt(Node* node)
         case NODE_IF:
             generate_if(node);
             break;
-        
+
         case NODE_WHILE:
             generate_while(node);
             break;
@@ -249,10 +303,6 @@ void generate_stmt(Node* node)
     }
 }
 
-void generate_input(Node* node){
-    if(node == NULL || node->left == NULL) return;
-    appendTAC(CreateTAC("input",node->left->val,"",""));
-}
 void generate_stmt_list(Node* node)
 {
     Node* curr = node;
@@ -281,25 +331,18 @@ void print_TAC()
     {
         if(strcmp(temp->result, "if") == 0 && strcmp(temp->op, "goto") == 0)
             printf("if %s goto %s\n", temp->arg1, temp->arg2);
-
         else if(strcmp(temp->result, "goto") == 0)
             printf("goto %s\n", temp->arg1);
-
         else if(strcmp(temp->op, "label") == 0)
             printf("%s:\n", temp->result);
-
-        else if(strcmp(temp->result,"print") == 0)
-            printf("print %s \n", temp->arg1);
-
-        else if(strcmp(temp->result,"input") == 0)
-            printf("input %s\n",temp->arg1);
-            
+        else if(strcmp(temp->result, "print") == 0)
+            printf("print %s\n", temp->arg1);
+        else if(strcmp(temp->result, "input") == 0)
+            printf("input %s\n", temp->arg1);
         else if(strcmp(temp->op, "!") == 0)
             printf("%s = ! %s\n", temp->result, temp->arg1);
-
         else if(strcmp(temp->op, "=") == 0)
             printf("%s = %s\n", temp->result, temp->arg1);
-
         else
             printf("%s = %s %s %s\n", temp->result, temp->arg1, temp->op, temp->arg2);
 

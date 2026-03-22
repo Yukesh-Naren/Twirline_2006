@@ -89,7 +89,7 @@ Node* parse_fact(){
 
         return node;
     }
-    if(current_token->type == NUM ){
+    if(current_token->type == NUM_INT || current_token->type ==NUM_FLOAT ){
         Node* node =CreateNode(current_token->lexeme,NODE_CONST);
         advance();
         return node;

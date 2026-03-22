@@ -205,19 +205,34 @@ void GetNextToken(FILE* fp)
             char buffer[50];
             int c=0;
             int j=0;
-            do{
+            while(isdigit(ch) || (ch=='.' && c == 0)){
                 if(ch == '.'){
                     c+=1;
                 }
+                if(c == 1 && ch =='.'){
+                    int next = fgetc(fp);
+                    if(!isdigit(next)){
+                        printf("Lexical Error: Invalid floating constant '.'\n");
+                        exit(1);
+                    }
+                    ungetc(next,fp);
+                }
                 buffer[j++] = ch;
                 ch = fgetc(fp);
-            }while(isdigit(ch) || (ch=='.' && c == 0));
+            }
 
             buffer[j]='\0';
             if(ch != EOF)
             ungetc(ch,fp);
-            Token *t = CreateToken(NUM, buffer);
-            addToken(t);
+            if(c==0){
+                Token *t = CreateToken(NUM_INT, buffer);
+                addToken(t);
+            }
+            else
+            {
+                Token *t = CreateToken(NUM_FLOAT,buffer);
+                addToken(t);
+            }  
         }
 
         else if(isalpha(ch) || ch == '_')
@@ -286,6 +301,11 @@ void GetNextToken(FILE* fp)
                 Token *t = CreateToken(INPUT ,buffer);
                 addToken(t);
                 continue; 
+            }
+            else if(strcmp(buffer,"char") == 0){
+                Token* t = CreateToken(CHAR, buffer);
+                addToken(t);
+                continue;
             }
             Token *t = CreateToken(ID , buffer);
             addToken(t);

@@ -16,6 +16,23 @@ void semanticError(const char *msg)
 
 /* ---------------- SYMBOL TABLE ---------------- */
 
+int get_symbol_type(const char *name) {
+    if(name == NULL) return TYPE_INT;
+    
+    if(strncmp(name, "tmp", 3) == 0)
+    return TYPE_INT;
+    
+    Symbol* sym = lookup_symbol((char*)name);
+
+    if (sym == NULL) {
+        // Optional: safer error instead of silent default
+        char msg[100];
+        sprintf(msg, "Variable '%s' not declared (type lookup)", name);
+        semanticError(msg);
+    }
+
+    return sym->type;
+}
 Symbol* lookup_symbol(char* name)
 {
     Symbol* temp = head;
@@ -30,7 +47,7 @@ Symbol* lookup_symbol(char* name)
     return NULL;
 }
 
-void add_symbol(char* name, int init)
+void add_symbol(char* name, int init, int type)
 {
     if (lookup_symbol(name) != NULL)
     {
@@ -43,11 +60,13 @@ void add_symbol(char* name, int init)
 
     strcpy(newSym->name, name);
     newSym->is_init = init;
-    newSym->value = 0;
+    newSym->type = type;
+    newSym->value = 0.0;
     newSym->next = head;
 
     head = newSym;
 }
+
 
 /* ---------------- PRINT SYMBOL TABLE ---------------- */
 
@@ -61,7 +80,7 @@ void print_symbol_table()
 
     while (temp != NULL)
     {
-        printf("%-10s %-10d %-10d\n",
+        printf("%-10s %-10d %-10.2f\n",
                temp->name,
                temp->is_init,
                temp->value);
@@ -73,14 +92,14 @@ void print_symbol_table()
 
 /* ---------------- EXPRESSION EVALUATION ---------------- */
 
-int evaluate_expression(Node* root)
+float evaluate_expression(Node* root)
 {
     if (root == NULL)
         semanticError("Invalid expression");
 
     if (root->type == NODE_CONST)
     {
-        return atoi(root->val);
+        return atof(root->val);
     }
 
     if (root->type == NODE_ID)
@@ -110,8 +129,8 @@ int evaluate_expression(Node* root)
             int val = evaluate_expression(root->left);
             return !val;
     }
-        int leftVal = evaluate_expression(root->left);
-        int rightVal = evaluate_expression(root->right);
+        float leftVal = evaluate_expression(root->left);
+        float rightVal = evaluate_expression(root->right);
 
         if (strcmp(root->val, "+") == 0)
             return leftVal + rightVal;
@@ -131,9 +150,12 @@ int evaluate_expression(Node* root)
 
         else if (strcmp(root->val, "%") == 0)
         {
-            if (rightVal == 0)
-                semanticError("Modulo by zero");
-            return leftVal % rightVal;
+            // if (rightVal == 0)
+            //     semanticError("Modulo by zero");
+            // return int(leftVal) % int(rightVal);
+
+            printf("Modulo functions does not work on Floating points.");
+            exit(1);
         }
 
         else if (strcmp(root->val, "<=") == 0)
@@ -180,6 +202,10 @@ int evaluate_expression(Node* root)
             semanticError(msg);
         }
 
+        if (sym->type == TYPE_INT && strchr(root->right->val, '.') != NULL) {
+         semanticError("Cannot assign float to int variable");
+        }
+
         int value = evaluate_expression(root->right);
 
         sym->value = value;
@@ -201,15 +227,22 @@ void check_semantics(Node* root)
     {
         if (current->type == NODE_DECL)
         {
-            /* int a; */
-            add_symbol(current->left->val, 0);
+            char* type = current->left->left->val;
+
+            if(strcmp(type,"int" )== 0)
+            add_symbol(current->left->val, 0 , TYPE_INT);
+            else
+            add_symbol(current->left->val, 0,TYPE_FLOAT);
         }
         else if (current->type == NODE_DECL_ASSN)
         {
-            /* int a = expr; */
+            char* type = current->left->left->val;
 
-            add_symbol(current->left->left->val, 0);
-
+            if(strcmp(type,"int") == 0)
+            add_symbol(current->left->val, 0 , TYPE_INT);
+            else
+            add_symbol(current->left->val, 0,TYPE_FLOAT);
+        
             Symbol* sym = lookup_symbol(current->left->left->val);
 
             int value = evaluate_expression(current->left->right);
@@ -266,7 +299,7 @@ void check_print(Node* node)
 void check_if(Node* node)
 {
     
-    int cond = evaluate_expression(node->left);
+    float cond = evaluate_expression(node->left);
 
     if(node->right == NULL) return;
 

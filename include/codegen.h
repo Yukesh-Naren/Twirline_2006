@@ -2,6 +2,7 @@
 #define CODEGEN_H
 
 #include "TAC.h"
+#include "semantics.h"
 
 void generate_riscv_code();
 void generate_riscv_instruction(TAC* temp);
