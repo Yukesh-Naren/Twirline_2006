@@ -1,8 +1,10 @@
 #include<stdio.h>
-#include "include/lexer.h"
-#include "include/parser.h"
-#include "include/AST.h"
-#include "include/semantics.h"
+#include "lexer.h"
+#include "parser.h"
+#include "AST.h"
+#include "semantics.h"
+#include "TAC.h"
+#include "codegen.h"
 int main()
 {
     FILE *fp;
@@ -36,8 +38,19 @@ int main()
     printf("\nRunning Semantic Analysis...\n");
 
     check_semantics(root);
-
+    print_symbol_table();
     printf("\nSemantic Analysis Completed Successfully\n");
-    freeAST(root);
 
+    printf("Starting TAC generation...\n");
+    Node* current = root;
+    
+    generate_TAC(root);
+    print_TAC();
+    printf("\nThree Address Code is Successful");
+    
+    generate_riscv_code();
+    printf("RISC- V Code Generation Successful\n");
+    
+    // freeTAC();
+    freeAST(root);
 }

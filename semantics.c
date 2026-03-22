@@ -1,205 +1,289 @@
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include "include/AST.h"
-// #include "include/semantics.h"
-
-// // 1. Your Error Function
-// void semanticError(const char *msg) {
-//     printf("Semantic Error: %s\n", msg);
-//     exit(1);
-// }
-
-// // 2. Your Type Checking Function
-// char* checkOpType(char* left, char* right, char* op) {
-//     if (left == NULL || right == NULL) return "void";
-
-//     // Arithmetic
-//     if (!strcmp(op, "+") || !strcmp(op, "-") || !strcmp(op, "*") || !strcmp(op, "/")) {
-//         if (!strcmp(left, "int") && !strcmp(right, "int"))
-//             return "int";
-
-//         if ((!strcmp(left, "int") && !strcmp(right, "float")) ||
-//             (!strcmp(left, "float") && !strcmp(right, "int")) ||
-//             (!strcmp(left, "float") && !strcmp(right, "float")))
-//             return "float";
-
-//         semanticError("Invalid operands for arithmetic operation");
-//     }
-
-//     // Assignment
-//     if (!strcmp(op, "=")) {
-//         if (strcmp(left, right) != 0)
-//             semanticError("Type mismatch in assignment");
-//         return left;
-//     }
-
-//     semanticError("Unknown operator");
-//     return NULL;
-// }
-
-// // 3. Determine type of a leaf node (ID or Constant)
-// char* getLeafType(Node* node) {
-//     if (node->type == NODE_CONST) {
-//         return (strchr(node->val, '.') != NULL) ? "float" : "int";
-//     }
-
-//     if (node->type == NODE_ID) {
-//         Symbol* sym = lookup_symbol(node->val);
-//         if (sym == NULL) {
-//             printf("Semantic Error: Variable '%s' used before declaration!\n", node->val);
-//             exit(1);
-//         }
-//         return "int"; // Logic: Pull actual type from Symbol Table later
-//     }
-//     return "void";
-// }
-
-// // 4. Recursive Evaluator for math trees (Left/Right)
-// char* evaluate_expression(Node* root) {
-//     if (root == NULL) return "void";
-
-//     if (root->left == NULL && root->right == NULL) {
-//         char* t = getLeafType(root);
-//         printf("Leaf: %s -> %s\n", root->val, t);
-//         return t;
-//     }
-
-//     char* leftT = evaluate_expression(root->left);
-//     char* rightT = evaluate_expression(root->right);
-
-//     if (root->type == NODE_OP || root->type == NODE_ASSIGN) {
-//         printf("Checking: %s (%s, %s)\n", root->val, leftT, rightT);
-//         return checkOpType(leftT, rightT, root->val);
-//     }
-//     return "void";
-// }
-
-// // 5. THE MAIN ENTRY POINT: Walks through lines (Next)
-// void check_semantics(Node* root) {
-//     Node* current = root;
-//     while (current != NULL) {
-//         if (current->type == NODE_DECL) {
-//             add_symbol(current->left->val, 0); 
-//         } 
-//         else if (current->type == NODE_DECL_ASSN) {
-//             evaluate_expression(current->left); 
-//             add_symbol(current->left->left->val, 1);
-//         } 
-//         else {
-//             evaluate_expression(current);
-//         }
-//         current = current->next; // Move to the next statement
-//     }
-// }
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/AST.h"
-#include "include/semantics.h"
+#include "ast.h"
+#include "semantics.h"
+/* Head of symbol table */
+Symbol* head = NULL;
 
-// --- SYMBOL TABLE LOGIC ---
-Symbol* symbol_table = NULL;
+/* ---------------- ERROR HANDLER ---------------- */
 
-void add_symbol(char* name, int init) {
-    Symbol* s = lookup_symbol(name);
-    if (s == NULL) {
-        // Create new symbol if it doesn't exist
-        s = (Symbol*)malloc(sizeof(Symbol));
-        strcpy(s->name, name);
-        s->is_init = init;
-        s->next = symbol_table;
-        symbol_table = s;
-    } else {
-        // If it exists, just mark it as initialized if needed
-        if (init) s->is_init = 1;
-    }
-}
-
-Symbol* lookup_symbol(char* name) {
-    Symbol* s = symbol_table;
-    while (s != NULL) {
-        if (strcmp(s->name, name) == 0) return s;
-        s = s->next;
-    }
-    return NULL;
-}
-
-// --- SEMANTIC ANALYSIS LOGIC ---
-
-void semanticError(const char *msg) {
+void semanticError(const char *msg)
+{
     printf("Semantic Error: %s\n", msg);
     exit(1);
 }
 
-char* checkOpType(char* left, char* right, char* op) {
-    if (left == NULL || right == NULL) return "void";
+/* ---------------- SYMBOL TABLE ---------------- */
 
-    if (!strcmp(op, "+") || !strcmp(op, "-") || !strcmp(op, "*") || !strcmp(op, "/")) {
-        if (!strcmp(left, "int") && !strcmp(right, "int")) return "int";
-        if ((!strcmp(left, "int") && !strcmp(right, "float")) ||
-            (!strcmp(left, "float") && !strcmp(right, "int")) ||
-            (!strcmp(left, "float") && !strcmp(right, "float"))) return "float";
-        semanticError("Invalid operands for arithmetic operation");
+Symbol* lookup_symbol(char* name)
+{
+    Symbol* temp = head;
+
+    while (temp != NULL)
+    {
+        if (strcmp(temp->name, name) == 0)
+            return temp;
+        temp = temp->next;
     }
 
-    if (!strcmp(op, "=")) {
-        if (strcmp(left, right) != 0) semanticError("Type mismatch in assignment");
-        return left;
-    }
-    return "void";
+    return NULL;
 }
 
-char* getLeafType(Node* node) {
-    if (node->type == NODE_CONST) {
-        return (strchr(node->val, '.') != NULL) ? "float" : "int";
+void add_symbol(char* name, int init)
+{
+    if (lookup_symbol(name) != NULL)
+    {
+        char msg[100];
+        sprintf(msg, "Variable '%s' already declared", name);
+        semanticError(msg);
     }
-    if (node->type == NODE_ID) {
-        Symbol* sym = lookup_symbol(node->val);
-        if (sym == NULL) {
-            printf("Semantic Error: Variable '%s' used before declaration!\n", node->val);
-            exit(1);
+
+    Symbol* newSym = (Symbol*)malloc(sizeof(Symbol));
+
+    strcpy(newSym->name, name);
+    newSym->is_init = init;
+    newSym->value = 0;
+    newSym->next = head;
+
+    head = newSym;
+}
+
+/* ---------------- PRINT SYMBOL TABLE ---------------- */
+
+void print_symbol_table()
+{
+    printf("\n===== SYMBOL TABLE =====\n");
+    printf("%-10s %-10s %-10s\n", "NAME", "INIT", "VALUE");
+    printf("--------------------------------\n");
+
+    Symbol* temp = head;
+
+    while (temp != NULL)
+    {
+        printf("%-10s %-10d %-10d\n",
+               temp->name,
+               temp->is_init,
+               temp->value);
+        temp = temp->next;
+    }
+
+    printf("================================\n");
+}
+
+/* ---------------- EXPRESSION EVALUATION ---------------- */
+
+int evaluate_expression(Node* root)
+{
+    if (root == NULL)
+        semanticError("Invalid expression");
+
+    if (root->type == NODE_CONST)
+    {
+        return atoi(root->val);
+    }
+
+    if (root->type == NODE_ID)
+    {
+        Symbol* sym = lookup_symbol(root->val);
+
+        if (sym == NULL)
+        {
+            char msg[100];
+            sprintf(msg, "Variable '%s' not declared", root->val);
+            semanticError(msg);
         }
-        return "int"; 
+
+        if (!sym->is_init)
+        {
+            char msg[100];
+            sprintf(msg, "Variable '%s' used without initialization", root->val);
+            semanticError(msg);
+        }
+
+        return sym->value;
     }
-    return "void";
+
+    if (root->type == NODE_OP)
+    {
+        if(strcmp(root->val, "!") == 0){
+            int val = evaluate_expression(root->left);
+            return !val;
+    }
+        int leftVal = evaluate_expression(root->left);
+        int rightVal = evaluate_expression(root->right);
+
+        if (strcmp(root->val, "+") == 0)
+            return leftVal + rightVal;
+
+        else if (strcmp(root->val, "-") == 0)
+            return leftVal - rightVal;
+
+        else if (strcmp(root->val, "*") == 0)
+            return leftVal * rightVal;
+
+        else if (strcmp(root->val, "/") == 0)
+        {
+            if (rightVal == 0)
+                semanticError("Division by zero");
+            return leftVal / rightVal;
+        }
+
+        else if (strcmp(root->val, "%") == 0)
+        {
+            if (rightVal == 0)
+                semanticError("Modulo by zero");
+            return leftVal % rightVal;
+        }
+
+        else if (strcmp(root->val, "<=") == 0)
+        return leftVal <= rightVal;
+
+        else if (strcmp(root->val, ">=") == 0)
+        return leftVal >= rightVal;
+
+        else if (strcmp(root->val, "<") == 0)
+        return leftVal < rightVal;
+
+        else if (strcmp(root->val, ">") == 0)
+        return leftVal > rightVal;
+
+        else if (strcmp(root->val, "==") == 0)
+        return leftVal == rightVal;
+
+        else if (strcmp(root->val, "!=") == 0)
+        return leftVal != rightVal;
+
+        else if (strcmp(root->val, "&&") == 0)
+        return leftVal && rightVal;
+
+        else if (strcmp(root->val, "||") == 0)
+        return leftVal || rightVal;
+
+        else
+        {
+            semanticError("Unknown operator");
+        }
+    }
+
+    if (root->type == NODE_ASSIGN)
+    {
+        if (root->left == NULL || root->left->type != NODE_ID)
+            semanticError("Invalid assignment");
+
+        Symbol* sym = lookup_symbol(root->left->val);
+
+        if (sym == NULL)
+        {
+            char msg[100];
+            sprintf(msg, "Variable '%s' not declared", root->left->val);
+            semanticError(msg);
+        }
+
+        int value = evaluate_expression(root->right);
+
+        sym->value = value;
+        sym->is_init = 1;
+
+        return value;
+    }
+
+    semanticError("Unsupported node type");
+    return 0;
 }
 
-char* evaluate_expression(Node* root) {
-    if (root == NULL) return "void";
-    if (root->left == NULL && root->right == NULL) return getLeafType(root);
+/* ---------------- MAIN SEMANTIC CHECK ---------------- */
 
-    char* leftT = evaluate_expression(root->left);
-    char* rightT = evaluate_expression(root->right);
-
-    if (root->type == NODE_OP || root->type == NODE_ASSIGN) {
-        return checkOpType(leftT, rightT, root->val);
-    }
-    return "void";
-}
-
-
-void check_semantics(Node* root) {
+void check_semantics(Node* root)
+{
     Node* current = root;
-    while (current != NULL) {
-        if (current->type == NODE_DECL) {
-            // Case: x(int);
-            // node->left is ID, node->left->left is TYPE
-            add_symbol(current->left->val, 0); 
-        } 
-        else if (current->type == NODE_DECL_ASSN) {
-            // Case: t(int) = 5;
-            // 1. First, register the variable so it exists in the table
-            // In your AST: current->left is '=', current->left->left is ID
-            add_symbol(current->left->left->val, 1);
-            
-            // 2. Now check the right side of the assignment (the expression)
-            evaluate_expression(current->left->right);
-        } 
-        else {
-            // Case: standard assignment like a = t + o;
+
+    while (current != NULL)
+    {
+        if (current->type == NODE_DECL)
+        {
+            /* int a; */
+            add_symbol(current->left->val, 0);
+        }
+        else if (current->type == NODE_DECL_ASSN)
+        {
+            /* int a = expr; */
+
+            add_symbol(current->left->left->val, 0);
+
+            Symbol* sym = lookup_symbol(current->left->left->val);
+
+            int value = evaluate_expression(current->left->right);
+
+            sym->value = value;
+            sym->is_init = 1;
+        }
+        else if (current->type == NODE_ASSIGN)
+        {
             evaluate_expression(current);
         }
+        else if (current->type == NODE_IF)
+        check_if(current);
+        else if (current->type == NODE_WHILE) // ADD THIS
+        {
+            check_while(current);
+        }
+        else
+        {
+            evaluate_expression(current);
+        }
+
         current = current->next;
+    }
+
+}
+
+void check_if(Node* node)
+{
+    if(node == NULL) return;
+
+    int cond = evaluate_expression(node->left);
+
+    if(node->right == NULL) return;
+
+    if(node->right->type == NODE_ELSE)
+    {
+        Node* elseWrap = node->right;
+
+        if(cond)
+        {
+            check_semantics(elseWrap->left);
+        }
+        else
+        {
+            if(elseWrap->right != NULL)
+            {
+                if(elseWrap->right->type == NODE_IF)
+                    check_if(elseWrap->right);
+                else
+                    check_semantics(elseWrap->right);
+            }
+        }
+    }
+    else
+    {
+        if(cond)
+            check_semantics(node->right);
+    }
+}
+
+void check_while(Node* node)
+{
+    if (node == NULL) return;
+
+    // 1. Validate the condition expression (e.g., i < 5)
+    // This will throw an error if 'i' isn't declared yet.
+    evaluate_expression(node->left);
+
+    // 2. Validate the body of the loop
+    if (node->right != NULL)
+    {
+        // Use check_semantics to walk through the list of statements inside the loop
+        check_semantics(node->right);
     }
 }

@@ -1,7 +1,35 @@
-x(int);
-t(int) = 5;
-o(int) = 9 * t + 2;
+a(int);
+b(int);
+c(int);
+d(int) = 0;
 
-a(int) = t + o; 
-b(int) = a * 2; 
-c(int) = b + o;  
+a=5;
+b=10;
+c=0;
+
+if(a<b) c=1;
+elif(a==b) c=2;
+elif(a>b) c=3;
+else c=4;
+
+if(a<b) start
+    c=c+1;
+    d=d-1;
+end
+elif(a==b) start
+    c=c+2;
+end
+else start
+    c=0;
+end
+
+if(a+b*2 < b && a!=0) c=10;
+elif(a==b || b<c) c=20;
+else c=30;
+i(int) = 0;
+result(int) = 1;
+
+while (i < 5) start
+    result = result * 2;
+    i = i + 1;
+end

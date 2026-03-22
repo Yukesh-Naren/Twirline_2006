@@ -12,6 +12,9 @@ typedef enum{
     NODE_DECL,
     NODE_DECL_ASSN,
     NODE_TYPE,
+    NODE_IF,
+    NODE_ELSE,
+    NODE_WHILE
 }NodeType;
 
 typedef struct Node{
