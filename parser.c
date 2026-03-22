@@ -1,5 +1,6 @@
 #include "include/lexer.h"
 #include "include/parser.h"
+#include "include/AST.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -28,9 +29,23 @@ int  match (int expected_type){
         exit(1);
     }
 }
+
+Node* parse_array_assignment(char* name) {
+    match(LB);
+    Node* index = parse_expr();
+    match(RB);
+    match(ASSIGN);
+    Node* expr = parse_expr();
+    match(SEMI);
+
+    Node* access = make_array_access_node(name, index);
+    return make_array_assign_node(access, expr);
+}
+
 Node* parse_declaration_assignment(char* var_name){
 
     Node* expr = parse_expr();
+    match(SEMI);
 
     Node* n = CreateNode("Decl_Assign",NODE_DECL_ASSN);
     n->left = CreateNode("=" , NODE_ASSIGN);
@@ -42,7 +57,8 @@ Node* parse_declaration_assignment(char* var_name){
 } // Gets input like x(int) = 5;
 
 Node* parse_declaration(){
-    char* var_name = current_token->lexeme;
+    char var_name [50];
+    strcpy(var_name,current_token->lexeme);
     match(ID);
     match(LP);
         char* type_name;
@@ -61,6 +77,17 @@ Node* parse_declaration(){
         exit(1);
     }
     match(RP);
+    if(current_token->type == LB){
+        match(LB);
+        
+        char size_val[50];
+        strcpy(size_val, current_token->lexeme);
+        match(NUM_INT);
+        match(RB);
+        match(SEMI);
+
+        return make_array_decl_node(var_name, type_name, size_val);
+    }
     if(current_token->type == SEMI){
         match(SEMI);
         Node* n = CreateNode("Declaration",NODE_DECL);
@@ -68,20 +95,28 @@ Node* parse_declaration(){
         n->left->left = CreateNode(type_name,NODE_TYPE);
         return n;
     }
-    else if(current_token->type == ASSIGN){
-        match(ASSIGN);
-        Node* n = parse_declaration_assignment(var_name);
-        return n;
-    }
+    // else if(current_token->type == ASSIGN){
+    //     match(ASSIGN);
+    //     Node* n = parse_declaration_assignment(var_name);
+    //     return n;
+    // }
     printf("Syntax Error: Expected ';' ");
     exit(1);
  }  //Gets input like x(int);
 
 Node* parse_fact(){
     if(current_token->type == ID ){
-        Node* node =CreateNode(current_token->lexeme,NODE_ID);
+        char name[50];
+        strcpy(name,current_token->lexeme);
         advance();
-        return node;
+
+        if(current_token->type == LB){
+            match(LB);
+            Node* index = parse_expr();
+            match(RB);
+            return make_array_access_node(name, index);
+        }
+        return CreateNode(name,NODE_ID);
     }
     if(current_token->type == NOT){
         advance();
@@ -213,25 +248,52 @@ Node* parse_logical_or(){
 
     return left;
 }
-Node* parse_assign(){
-    if(current_token->type == ID){
-        if((current+1)<tokencount && tokens[current+1]->type == LP){
+Node* parse_assign() {
+    if (current_token->type == ID) {
+
+        if ((current + 1) < tokencount && tokens[current + 1]->type == LP) {
             return parse_declaration();
         }
-        // printf("Parsing Assignment...\n");
-        if((current+1)<tokencount && tokens[current+1]->type == ASSIGN){
-            char* name = strdup(current_token->lexeme);
+
+        
+        if ((current + 1) < tokencount && tokens[current + 1]->type == ASSIGN) {
+            char name[50];
+            strcpy(name, current_token->lexeme);
             advance();
             match(ASSIGN);
 
-            Node* right =parse_assign();
+            Node* right = parse_assign();
 
-            Node* node = CreateNode("=",NODE_ASSIGN);
-            node->left = CreateNode(name,NODE_ID);
+            Node* node = CreateNode("=", NODE_ASSIGN);
+            node->left = CreateNode(name, NODE_ID);
             node->right = right;
             return node;
         }
+
+        
+        if ((current + 1) < tokencount && tokens[current + 1]->type == LB) {
+            char name[50];
+            strcpy(name, current_token->lexeme);
+
+            int temp = current + 1; 
+            int bracket_count = 0;
+
+            while (temp < tokencount) {
+                if (tokens[temp]->type == LB) bracket_count++;
+                else if (tokens[temp]->type == RB) {
+                    bracket_count--;
+                    if (bracket_count == 0) break;
+                }
+                temp++;
+            }
+
+            if ((temp + 1) < tokencount && tokens[temp + 1]->type == ASSIGN) {
+                advance(); 
+                return parse_array_assignment(name);
+            }
+        }
     }
+
     return parse_logical_or();
 }
 
@@ -391,6 +453,9 @@ Node* parse_statement(){
     else if (current_token->type == WHILE) { 
         return parse_while();
     }
+    else if (current_token->type == FOR){
+        return parse_for();
+    }
     else if(current_token->type == PRINT){
         return parse_print();
     }
@@ -412,6 +477,46 @@ Node* parse_statement(){
         exit(1);
 }
 
+Node* parse_for() {
+    match(FOR);
+    match(LP);
+
+    Node* init = parse_assign();
+    match(SEMI);
+
+    Node* cond = parse_expr();
+    match(SEMI);
+
+    Node* inc = parse_assign();
+    match(RP);
+
+    Node* body = NULL;
+    if(current_token->type == START){
+    match(START);
+    body = parse_stmt_list();
+    match(END);
+    }
+    else
+    body = parse_statement();
+
+
+    Node* temp = body;
+    if (temp == NULL) {
+        body = inc;
+    } else {
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = inc;
+    }
+
+    Node* whileNode = CreateNode("while", NODE_WHILE);
+    whileNode->left = cond;
+    whileNode->right = body;
+
+    init->next = whileNode;
+
+    return init;
+}
 Node* parse_while() {
     match(WHILE); 
     match(LP);    
@@ -452,8 +557,9 @@ Node* parse_stmt_list(){
         }
         else{
             tail->next = stmtNode;
-            tail = stmtNode;
         }
+        while(tail->next != NULL)
+        tail = tail->next;
     }
 
     return head;
@@ -476,9 +582,9 @@ Node* parse_program(){
             temp = stmt;
         } else{
             temp->next = stmt;
-            temp =stmt;
         }
-        
+        while(temp->next != NULL)
+        temp = temp->next;
     }
     return head;
 }

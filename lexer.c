@@ -73,6 +73,18 @@ void GetNextToken(FILE* fp)
             addToken(t);       
         }
 
+        else if(ch == '[')
+        {
+            Token* t = CreateToken(LB,"[");
+            addToken(t);
+        }
+
+        else if(ch == ']')
+        {
+            Token* t = CreateToken(RB, "]");
+            addToken(t);
+        }
+
         else if(ch=='(')
         {
             Token *t =CreateToken(LP, "(");
@@ -324,6 +336,11 @@ void GetNextToken(FILE* fp)
             }
             else if(strcmp(buffer,"char") == 0){
                 Token* t = CreateToken(CHAR, buffer);
+                addToken(t);
+                continue;
+            }
+            else if(strcmp(buffer,"for") == 0){
+                Token* t = CreateToken(FOR, buffer);
                 addToken(t);
                 continue;
             }

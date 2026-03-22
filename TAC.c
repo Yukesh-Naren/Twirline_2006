@@ -12,10 +12,6 @@ int tempcount = 1;
 int labelcount = 1;
 
 int get_expr_type(Node* root);
-char* generate_expr(Node* root);
-void generate_stmt(Node* node);
-void generate_stmt_list(Node* node);
-void generate_input(Node* node);
 
 TAC* CreateTAC(char* result, char* arg1, char* op, char* arg2, int type)
 {
@@ -113,7 +109,7 @@ int get_expr_type(Node* root)
 
     if (root->type == NODE_CONST) {
         if(root->val[0] == '\'' && root->val[2] == '\'')
-        return TYPE_CHAR;
+            return TYPE_CHAR;
         if (strchr(root->val, '.') != NULL)
             return TYPE_FLOAT;
         return TYPE_INT;
@@ -123,8 +119,16 @@ int get_expr_type(Node* root)
         return get_symbol_type(root->val);
     }
 
+    if (root->type == NODE_ARRAY_ACCESS) {
+        return get_symbol_type(root->left->val);
+    }
+
     if (root->type == NODE_ASSIGN) {
         return get_symbol_type(root->left->val);
+    }
+
+    if (root->type == NODE_ARRAY_ASSIGN) {
+        return get_symbol_type(root->left->left->val);
     }
 
     if (root->type == NODE_OP) {
@@ -155,6 +159,14 @@ char* generate_expr(Node* root)
     if(root->type == NODE_CONST || root->type == NODE_ID)
     {
         return strdup(root->val);
+    }
+
+    if(root->type == NODE_ARRAY_ACCESS)
+    {
+        char* index = generate_expr(root->right);
+        char* temp = newTemp();
+        appendTAC(CreateTAC(temp, root->left->val, "=[]", index, get_expr_type(root)));
+        return temp;
     }
 
     if(root->type == NODE_OP)
@@ -193,6 +205,17 @@ void generate_assign(Node* node)
 
     char* rhs = generate_expr(node->right);
     appendTAC(CreateTAC(node->left->val, rhs, "=", "", get_symbol_type(node->left->val)));
+}
+
+void generate_array_assign(Node* node)
+{
+    if(node == NULL) return;
+
+    Node* access = node->left;
+    char* index = generate_expr(access->right);
+    char* value = generate_expr(node->right);
+
+    appendTAC(CreateTAC(access->left->val, index, "[]=", value, get_symbol_type(access->left->val)));
 }
 
 void generate_while(Node* node)
@@ -272,6 +295,7 @@ void generate_stmt(Node* node)
     switch(node->type)
     {
         case NODE_DECL:
+        case NODE_ARRAY_DECL:
             break;
 
         case NODE_DECL_ASSN:
@@ -281,6 +305,10 @@ void generate_stmt(Node* node)
 
         case NODE_ASSIGN:
             generate_assign(node);
+            break;
+
+        case NODE_ARRAY_ASSIGN:
+            generate_array_assign(node);
             break;
 
         case NODE_IF:
@@ -345,6 +373,10 @@ void print_TAC()
             printf("%s = ! %s\n", temp->result, temp->arg1);
         else if(strcmp(temp->op, "=") == 0)
             printf("%s = %s\n", temp->result, temp->arg1);
+        else if(strcmp(temp->op, "=[]") == 0)
+            printf("%s = %s[%s]\n", temp->result, temp->arg1, temp->arg2);
+        else if(strcmp(temp->op, "[]=") == 0)
+            printf("%s[%s] = %s\n", temp->result, temp->arg1, temp->arg2);
         else
             printf("%s = %s %s %s\n", temp->result, temp->arg1, temp->op, temp->arg2);
 

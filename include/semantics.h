@@ -15,6 +15,11 @@ typedef struct Symbol {
     int is_init;
     float value; 
     int type;         
+
+    int is_array;
+    int array_size;
+    float* array_values;
+    int* array_init;
     struct Symbol* next;
 } Symbol;
 

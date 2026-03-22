@@ -1,7 +1,10 @@
-c(char);
+a(int)[5];
+i(int);
 x(int);
 
-c = 'A';
-x = c + 1;
-print(c);
-print(x);
+for(i = 0; i < 5; i = i + 1) start
+    a[i] = i;
+end
+
+x = a[3];
+print("x=", x);

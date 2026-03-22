@@ -172,7 +172,7 @@ void add_var(const char* name) {
     if (name == NULL || name[0] == '\0') return;
     if (is_int_literal(name)) return;
     if (is_float_literal(name)) return;
-    if (is_char_literal(name)) return ; 
+    if (is_char_literal(name)) return;
     if (strcmp(name, "if") == 0) return;
     if (strcmp(name, "goto") == 0) return;
     if (strcmp(name, "input") == 0) return;
@@ -196,8 +196,6 @@ int add_string(const char* s) {
     strcpy(strings[stringCount], s);
     return stringCount++;
 }
-
-
 
 void collect_variables() {
     TAC* temp = tacHead;
@@ -259,18 +257,40 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    la t3, %s\n", temp->result);
             printf("    fsw ft0, 0(t3)\n");
             return;
-        }else if (temp->type == TYPE_CHAR){
-            load_char_operand(temp->arg1,"t0");
+        } else if (temp->type == TYPE_CHAR) {
+            load_char_operand(temp->arg1, "t0");
             printf("    la t3, %s\n", temp->result);
             printf("    sb t0, 0(t3)\n");
             return;
-        } 
-        else {
+        } else {
             load_int_operand(temp->arg1, "t0");
             printf("    la t3, %s\n", temp->result);
             printf("    sw t0, 0(t3)\n");
             return;
         }
+    }
+
+    if (strcmp(temp->op, "=[]") == 0) {
+        load_int_operand(temp->arg2, "t0");
+        printf("    li t1, 4\n");
+        printf("    mul t2, t0, t1\n");
+        printf("    la t3, %s\n", temp->arg1);
+        printf("    add t4, t3, t2\n");
+        printf("    lw t5, 0(t4)\n");
+        printf("    la t3, %s\n", temp->result);
+        printf("    sw t5, 0(t3)\n");
+        return;
+    }
+
+    if (strcmp(temp->op, "[]=") == 0) {
+        load_int_operand(temp->arg1, "t0");
+        printf("    li t1, 4\n");
+        printf("    mul t2, t0, t1\n");
+        printf("    la t3, %s\n", temp->result);
+        printf("    add t4, t3, t2\n");
+        load_int_operand(temp->arg2, "t5");
+        printf("    sw t5, 0(t4)\n");
+        return;
     }
 
     if (strcmp(temp->result, "input") == 0) {
@@ -279,8 +299,9 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    ecall\n");
             printf("    la t3, %s\n", temp->arg1);
             printf("    fsw fa0, 0(t3)\n");
+            return;
         }
-        if (temp->type == TYPE_CHAR) {
+        else if (temp->type == TYPE_CHAR) {
             printf("    li a7, 12\n");
             printf("    ecall\n");
             printf("    la t3, %s\n", temp->arg1);
@@ -292,8 +313,8 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    ecall\n");
             printf("    la t3, %s\n", temp->arg1);
             printf("    sw a0, 0(t3)\n");
+            return;
         }
-        return;
     }
 
     if (strcmp(temp->result, "print") == 0) {
@@ -309,7 +330,7 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    li a7, 2\n");
             printf("    ecall\n");
         }
-        else if (temp->type == TYPE_CHAR || is_char_literal(temp->arg1)){
+        else if (temp->type == TYPE_CHAR || is_char_literal(temp->arg1)) {
             load_char_operand(temp->arg1, "a0");
             printf("    li a7, 11\n");
             printf("    ecall\n");
@@ -330,127 +351,129 @@ void generate_riscv_instruction(TAC* temp) {
         return;
     }
 
-    int operandsAreFloat = operand_is_float(temp->arg1) || operand_is_float(temp->arg2);
+    {
+        int operandsAreFloat = operand_is_float(temp->arg1) || operand_is_float(temp->arg2);
 
-    if (operandsAreFloat) {
-    load_as_float(temp->arg1, "ft0", "t0");
-    load_as_float(temp->arg2, "ft1", "t1");
+        if (operandsAreFloat) {
+            load_as_float(temp->arg1, "ft0", "t0");
+            load_as_float(temp->arg2, "ft1", "t1");
 
-    if (strcmp(temp->op, "+") == 0) {
-        printf("    fadd.s ft2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    fsw ft2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "-") == 0) {
-        printf("    fsub.s ft2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    fsw ft2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "*") == 0) {
-        printf("    fmul.s ft2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    fsw ft2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "/") == 0) {
-        printf("    fdiv.s ft2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    fsw ft2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "<") == 0) {
-        printf("    flt.s t2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, ">") == 0) {
-        printf("    flt.s t2, ft1, ft0\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "<=") == 0) {
-        printf("    fle.s t2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, ">=") == 0) {
-        printf("    fle.s t2, ft1, ft0\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "==") == 0) {
-        printf("    feq.s t2, ft0, ft1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else if (strcmp(temp->op, "!=") == 0) {
-        printf("    feq.s t2, ft0, ft1\n");
-        printf("    xori t2, t2, 1\n");
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-    }
-    else {
-        printf("    # Unknown float operator %s\n", temp->op);
-        return;
-        }
-    }
-    else {
-        load_int_operand(temp->arg1, "t0");
-        load_int_operand(temp->arg2, "t1");
-
-        if (strcmp(temp->op, "+") == 0) {
-            printf("    add t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "-") == 0) {
-            printf("    sub t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "*") == 0) {
-            printf("    mul t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "/") == 0) {
-            printf("    div t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "%") == 0) {
-            printf("    rem t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "<") == 0) {
-            printf("    slt t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, ">") == 0) {
-            printf("    slt t2, t1, t0\n");
-        }
-        else if (strcmp(temp->op, "<=") == 0) {
-            printf("    slt t2, t1, t0\n");
-            printf("    xori t2, t2, 1\n");
-        }
-        else if (strcmp(temp->op, ">=") == 0) {
-            printf("    slt t2, t0, t1\n");
-            printf("    xori t2, t2, 1\n");
-        }
-        else if (strcmp(temp->op, "==") == 0) {
-            printf("    sub t2, t0, t1\n");
-            printf("    seqz t2, t2\n");
-        }
-        else if (strcmp(temp->op, "!=") == 0) {
-            printf("    sub t2, t0, t1\n");
-            printf("    snez t2, t2\n");
-        }
-        else if (strcmp(temp->op, "&&") == 0) {
-            printf("    snez t0, t0\n");
-            printf("    snez t1, t1\n");
-            printf("    and t2, t0, t1\n");
-        }
-        else if (strcmp(temp->op, "||") == 0) {
-            printf("    snez t0, t0\n");
-            printf("    snez t1, t1\n");
-            printf("    or t2, t0, t1\n");
+            if (strcmp(temp->op, "+") == 0) {
+                printf("    fadd.s ft2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    fsw ft2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "-") == 0) {
+                printf("    fsub.s ft2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    fsw ft2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "*") == 0) {
+                printf("    fmul.s ft2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    fsw ft2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "/") == 0) {
+                printf("    fdiv.s ft2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    fsw ft2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "<") == 0) {
+                printf("    flt.s t2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, ">") == 0) {
+                printf("    flt.s t2, ft1, ft0\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "<=") == 0) {
+                printf("    fle.s t2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, ">=") == 0) {
+                printf("    fle.s t2, ft1, ft0\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "==") == 0) {
+                printf("    feq.s t2, ft0, ft1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else if (strcmp(temp->op, "!=") == 0) {
+                printf("    feq.s t2, ft0, ft1\n");
+                printf("    xori t2, t2, 1\n");
+                printf("    la t3, %s\n", temp->result);
+                printf("    sw t2, 0(t3)\n");
+            }
+            else {
+                printf("    # Unknown float operator %s\n", temp->op);
+                return;
+            }
         }
         else {
-            printf("    # Unknown integer operator %s\n", temp->op);
+            load_int_operand(temp->arg1, "t0");
+            load_int_operand(temp->arg2, "t1");
+
+            if (strcmp(temp->op, "+") == 0) {
+                printf("    add t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "-") == 0) {
+                printf("    sub t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "*") == 0) {
+                printf("    mul t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "/") == 0) {
+                printf("    div t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "%") == 0) {
+                printf("    rem t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "<") == 0) {
+                printf("    slt t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, ">") == 0) {
+                printf("    slt t2, t1, t0\n");
+            }
+            else if (strcmp(temp->op, "<=") == 0) {
+                printf("    slt t2, t1, t0\n");
+                printf("    xori t2, t2, 1\n");
+            }
+            else if (strcmp(temp->op, ">=") == 0) {
+                printf("    slt t2, t0, t1\n");
+                printf("    xori t2, t2, 1\n");
+            }
+            else if (strcmp(temp->op, "==") == 0) {
+                printf("    sub t2, t0, t1\n");
+                printf("    seqz t2, t2\n");
+            }
+            else if (strcmp(temp->op, "!=") == 0) {
+                printf("    sub t2, t0, t1\n");
+                printf("    snez t2, t2\n");
+            }
+            else if (strcmp(temp->op, "&&") == 0) {
+                printf("    snez t0, t0\n");
+                printf("    snez t1, t1\n");
+                printf("    and t2, t0, t1\n");
+            }
+            else if (strcmp(temp->op, "||") == 0) {
+                printf("    snez t0, t0\n");
+                printf("    snez t1, t1\n");
+                printf("    or t2, t0, t1\n");
+            }
+            else {
+                printf("    # Unknown integer operator %s\n", temp->op);
+                return;
+            }
+
+            printf("    la t3, %s\n", temp->result);
+            printf("    sw t2, 0(t3)\n");
             return;
         }
-
-        printf("    la t3, %s\n", temp->result);
-        printf("    sw t2, 0(t3)\n");
-        return;
     }
 }
 
@@ -482,9 +505,14 @@ void generate_riscv_code() {
             else
                 printf("%s: .word 0\n", vars[i]);
         } else {
-            if (get_symbol_type(vars[i]) == TYPE_FLOAT)
+            Symbol* sym = lookup_symbol(vars[i]);
+
+            if (sym && sym->is_array) {
+                printf("%s: .space %d\n", vars[i], sym->array_size * 4);
+            }
+            else if (get_symbol_type(vars[i]) == TYPE_FLOAT)
                 printf("%s: .float 0.0\n", vars[i]);
-            else if (get_temp_type(vars[i]) == TYPE_CHAR)
+            else if (get_symbol_type(vars[i]) == TYPE_CHAR)
                 printf("%s: .byte 0\n", vars[i]);
             else
                 printf("%s: .word 0\n", vars[i]);

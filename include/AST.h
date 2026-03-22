@@ -18,6 +18,9 @@ typedef enum{
     NODE_STRING,
     NODE_PRINT,
     NODE_INPUT,
+    NODE_ARRAY_DECL,
+    NODE_ARRAY_ACCESS,
+    NODE_ARRAY_ASSIGN
 }NodeType;
 
 typedef struct Node{
@@ -28,6 +31,9 @@ typedef struct Node{
     struct Node* next;
 }Node;
 
+Node* make_array_decl_node(char* name , char* type, char* size);
+Node* make_array_access_node(char* name, Node* indexNode);
+Node* make_array_assign_node(Node* accessNode, Node* valueNode);
 Node* CreateNode(char* val, NodeType type);
 void printProgram(Node* root);
 void printAST(Node* root , int level);

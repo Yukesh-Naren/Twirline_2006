@@ -3,10 +3,8 @@
 #include <string.h>
 #include "ast.h"
 #include "semantics.h"
-/* Head of symbol table */
-Symbol* head = NULL;
 
-/* ---------------- ERROR HANDLER ---------------- */
+Symbol* head = NULL;
 
 void semanticError(const char *msg)
 {
@@ -14,18 +12,15 @@ void semanticError(const char *msg)
     exit(1);
 }
 
-/* ---------------- SYMBOL TABLE ---------------- */
-
 int get_symbol_type(const char *name) {
     if(name == NULL) return TYPE_INT;
-    
+
     if(strncmp(name, "tmp", 3) == 0)
-    return TYPE_INT;
-    
+        return TYPE_INT;
+
     Symbol* sym = lookup_symbol((char*)name);
 
     if (sym == NULL) {
-        // Optional: safer error instead of silent default
         char msg[100];
         sprintf(msg, "Variable '%s' not declared (type lookup)", name);
         semanticError(msg);
@@ -33,6 +28,7 @@ int get_symbol_type(const char *name) {
 
     return sym->type;
 }
+
 Symbol* lookup_symbol(char* name)
 {
     Symbol* temp = head;
@@ -62,223 +58,188 @@ void add_symbol(char* name, int init, int type)
     newSym->is_init = init;
     newSym->type = type;
     newSym->value = 0.0;
-    newSym->next = head;
 
+    newSym->is_array = 0;
+    newSym->array_size = 0;
+    newSym->array_values = NULL;
+    newSym->array_init = NULL;
+
+    newSym->next = head;
     head = newSym;
 }
 
+void add_array_symbol(char* name, int type, int size)
+{
+    if (lookup_symbol(name) != NULL)
+    {
+        char msg[100];
+        sprintf(msg, "Variable '%s' already declared", name);
+        semanticError(msg);
+    }
 
-/* ---------------- PRINT SYMBOL TABLE ---------------- */
+    if (size <= 0)
+        semanticError("Invalid array size");
+
+    Symbol* newSym = (Symbol*)malloc(sizeof(Symbol));
+
+    strcpy(newSym->name, name);
+    newSym->is_init = 1;
+    newSym->type = type;
+    newSym->value = 0.0;
+
+    newSym->is_array = 1;
+    newSym->array_size = size;
+    newSym->array_values = (float*)calloc(size, sizeof(float));
+    newSym->array_init = (int*)calloc(size, sizeof(int));
+
+    newSym->next = head;
+    head = newSym;
+}
 
 void print_symbol_table()
 {
     printf("\n===== SYMBOL TABLE =====\n");
-    printf("%-10s %-10s %-10s\n", "NAME", "INIT", "VALUE");
-    printf("--------------------------------\n");
+    printf("%-10s %-10s %-10s %-10s %-10s\n", "NAME", "INIT", "VALUE", "ARRAY", "SIZE");
+    printf("------------------------------------------------------------\n");
 
     Symbol* temp = head;
 
     while (temp != NULL)
     {
-        printf("%-10s %-10d %-10.2f\n",
+        printf("%-10s %-10d %-10.2f %-10d %-10d\n",
                temp->name,
                temp->is_init,
-               temp->value);
+               temp->value,
+               temp->is_array,
+               temp->array_size);
         temp = temp->next;
     }
 
-    printf("================================\n");
+    printf("============================================================\n");
 }
 
-/* ---------------- EXPRESSION EVALUATION ---------------- */
-
-float evaluate_expression(Node* root)
+int get_node_type_from_decl(Node* typeNode)
 {
-    if (root == NULL)
-        semanticError("Invalid expression");
+    if (strcmp(typeNode->val, "int") == 0) return TYPE_INT;
+    if (strcmp(typeNode->val, "float") == 0) return TYPE_FLOAT;
+    if (strcmp(typeNode->val, "char") == 0) return TYPE_CHAR;
+    semanticError("Unknown declaration type");
+    return TYPE_INT;
+}
 
-    if (root->type == NODE_CONST)
-    {
-        if (root->val[0] == '\'' && root->val[2] == '\'')
-        return ((float)root->val[1]);
-        return atof(root->val);
+void validate_assignment_type(Symbol* sym, float value)
+{
+    if (sym->type == TYPE_INT && value != (int)value) {
+        semanticError("Cannot assign float to int variable");
     }
 
-    if (root->type == NODE_ID)
+    if (sym->type == TYPE_CHAR) {
+        if (value != (int)value || value < 0 || value > 255)
+            semanticError("Invalid char assignment");
+    }
+}
+
+float evaluate_expression(Node* node)
+{
+    if (node == NULL) return 0;
+
+    if (node->type == NODE_CONST)
+        return atof(node->val);
+
+    if (node->type == NODE_ID)
     {
-        Symbol* sym = lookup_symbol(root->val);
-
+        Symbol* sym = lookup_symbol(node->val);
         if (sym == NULL)
-        {
-            char msg[100];
-            sprintf(msg, "Variable '%s' not declared", root->val);
-            semanticError(msg);
-        }
-
-        if (!sym->is_init)
-        {
-            char msg[100];
-            sprintf(msg, "Variable '%s' used without initialization", root->val);
-            semanticError(msg);
-        }
+            semanticError("Undeclared variable");
 
         return sym->value;
     }
 
-    if (root->type == NODE_OP)
+    if (node->type == NODE_ARRAY_ACCESS)
     {
-        if(strcmp(root->val, "!") == 0){
-            int val = evaluate_expression(root->left);
-            return !val;
-    }
-        float leftVal = evaluate_expression(root->left);
-        float rightVal = evaluate_expression(root->right);
+        Symbol* sym = lookup_symbol(node->left->val);
+        if (!sym)
+            semanticError("Undeclared array");
 
-        if (strcmp(root->val, "+") == 0)
-            return leftVal + rightVal;
+        if (!sym->is_array)
+            semanticError("Variable is not an array");
 
-        else if (strcmp(root->val, "-") == 0)
-            return leftVal - rightVal;
+        int idx = (int)evaluate_expression(node->right);
 
-        else if (strcmp(root->val, "*") == 0)
-            return leftVal * rightVal;
+        if (idx < 0 || idx >= sym->array_size)
+            semanticError("Array index out of bounds");
 
-        else if (strcmp(root->val, "/") == 0)
-        {
-            if (rightVal == 0)
-                semanticError("Division by zero");
-            return leftVal / rightVal;
-        }
-
-        else if (strcmp(root->val, "%") == 0)
-        {
-            // if (rightVal == 0)
-            //     semanticError("Modulo by zero");
-            // return int(leftVal) % int(rightVal);
-
-            printf("Modulo functions does not work on Floating points.");
-            exit(1);
-        }
-
-        else if (strcmp(root->val, "<=") == 0)
-        return leftVal <= rightVal;
-
-        else if (strcmp(root->val, ">=") == 0)
-        return leftVal >= rightVal;
-
-        else if (strcmp(root->val, "<") == 0)
-        return leftVal < rightVal;
-
-        else if (strcmp(root->val, ">") == 0)
-        return leftVal > rightVal;
-
-        else if (strcmp(root->val, "==") == 0)
-        return leftVal == rightVal;
-
-        else if (strcmp(root->val, "!=") == 0)
-        return leftVal != rightVal;
-
-        else if (strcmp(root->val, "&&") == 0)
-        return leftVal && rightVal;
-
-        else if (strcmp(root->val, "||") == 0)
-        return leftVal || rightVal;
-
-        else
-        {
-            semanticError("Unknown operator");
-        }
+        return sym->array_values[idx];
     }
 
-    if (root->type == NODE_ASSIGN)
+    if (node->type == NODE_OP)
     {
-        if (root->left == NULL || root->left->type != NODE_ID)
-            semanticError("Invalid assignment");
+        float left = evaluate_expression(node->left);
+        float right = evaluate_expression(node->right);
 
-        Symbol* sym = lookup_symbol(root->left->val);
-
-        if (sym == NULL)
-        {
-            char msg[100];
-            snprintf(msg,sizeof(msg), "Variable '%s' not declared", root->left->val);
-            semanticError(msg);
-        }
-
-        float value = evaluate_expression(root->right);
-
-        if (sym->type == TYPE_INT && value != (int)value) {
-            semanticError("Cannot assign float to int variable");
-        }
-
-        if (sym->type == TYPE_CHAR) {
-            if (value != (int)value || value < 0 || value > 255) {
-                semanticError("Character value out of range");
-            }
-        }
-
-        sym->value = value;
-        sym->is_init = 1;
-
-        return value;
+        if (!strcmp(node->val, "+")) return left + right;
+        if (!strcmp(node->val, "-")) return left - right;
+        if (!strcmp(node->val, "*")) return left * right;
+        if (!strcmp(node->val, "/")) return left / right;
     }
 
-    semanticError("Unsupported node type");
     return 0;
 }
-
-/* ---------------- MAIN SEMANTIC CHECK ---------------- */
 
 void check_semantics(Node* root)
 {
     Node* current = root;
+
     while (current != NULL)
     {
         if (current->type == NODE_DECL)
         {
-            char* type = current->left->left->val;
-
-            if(strcmp(type,"int" )== 0)
-            add_symbol(current->left->val, 0 , TYPE_INT);
-            else if(strcmp(type , "float") == 0)
-            add_symbol(current->left->val, 0,TYPE_FLOAT);
-            else if(strcmp(type, "char") == 0)
-            add_symbol(current->left->val, 0 , TYPE_CHAR);
+            char* name = current->left->val;
+            int type = get_node_type_from_decl(current->left->left);
+            add_symbol(name, 0, type);
         }
-        else if (current->type == NODE_DECL_ASSN)
+        else if (current->type == NODE_ARRAY_DECL)
         {
-            char* type = current->left->left->val;
+            char* name = current->left->val;
+            int type = get_node_type_from_decl(current->left->left);
+            int size = atoi(current->right->val);
 
-            if(strcmp(type,"int") == 0)
-            add_symbol(current->left->val, 0 , TYPE_INT);
-            else if(strcmp(type , "float") == 0)
-            add_symbol(current->left->val, 0,TYPE_FLOAT);
-            else if(strcmp(type, "char") == 0)
-            add_symbol(current->left->val, 0 , TYPE_CHAR);
-        
-            Symbol* sym = lookup_symbol(current->left->left->val);
-
-            int value = evaluate_expression(current->left->right);
-
-            sym->value = value;
-            sym->is_init = 1;
+            add_array_symbol(name, type, size);
         }
         else if (current->type == NODE_ASSIGN)
         {
-            evaluate_expression(current);
+            Symbol* sym = lookup_symbol(current->left->val);
+            if (!sym)
+                semanticError("Undeclared variable");
+
+            float val = evaluate_expression(current->right);
+            validate_assignment_type(sym, val);
+
+            sym->value = val;
+            sym->is_init = 1;
         }
+        else if (current->type == NODE_ARRAY_ASSIGN)
+        {
+            Node* access = current->left;
 
-        else if (current->type == NODE_IF)
-        check_if(current);
-        
-        else if (current->type == NODE_WHILE)
-        check_while(current);
+            Symbol* sym = lookup_symbol(access->left->val);
+            if (!sym)
+                semanticError("Undeclared array");
 
-        else if (current->type == NODE_PRINT)
-        check_print(current);
+            if (!sym->is_array)
+                semanticError("Variable is not an array");
 
-        else if(current->type == NODE_INPUT)
-        check_input(current);
+            int idx = (int)evaluate_expression(access->right);
 
+            if (idx < 0 || idx >= sym->array_size)
+                semanticError("Array index out of bounds");
+
+            float val = evaluate_expression(current->right);
+            validate_assignment_type(sym, val);
+
+            sym->array_values[idx] = val;
+            sym->array_init[idx] = 1;
+        }
         else
         {
             evaluate_expression(current);
@@ -286,83 +247,4 @@ void check_semantics(Node* root)
 
         current = current->next;
     }
-
-}
-
-void check_print(Node* node)
-{
-    if(node == NULL) {
-        semanticError("Invalid print statement");
-        return;
-    }
-
-    Node* arg = node->left;
-
-    if (arg == NULL){
-        semanticError("print has no arguments");
-        return;
-    }
-    while(arg != NULL){
-        if(arg->type != NODE_STRING)
-        evaluate_expression(arg);
-        arg = arg->next;
-    }
-}
-void check_if(Node* node)
-{
-    
-    float cond = evaluate_expression(node->left);
-
-    if(node->right == NULL) return;
-
-    if(node->right->type == NODE_ELSE)
-    {
-        Node* elseWrap = node->right;
-
-        if(cond)
-        {
-            check_semantics(elseWrap->left);
-        }
-        else
-        {
-            if(elseWrap->right != NULL)
-            {
-                if(elseWrap->right->type == NODE_IF)
-                    check_if(elseWrap->right);
-                else
-                    check_semantics(elseWrap->right);
-            }
-        }
-    }
-    else
-    {
-        if(cond)
-            check_semantics(node->right);
-    }
-}
-
-void check_while(Node* node)
-{
-    if (node == NULL) return;
-    if (node ->left == NULL){
-        semanticError("while condition missing!");
-        return;
-    }
-    while(evaluate_expression(node->left)){
-        check_semantics(node->right);
-    }
-}
-
-void check_input(Node* node)
-{
-    if(node == NULL || node->left == NULL || node->left->type != NODE_ID)
-    semanticError("Invalid input statement");
-
-    Symbol* sym = lookup_symbol(node->left->val);
-    if(sym == NULL){
-        char msg[100];
-        sprintf(msg, "Variable '%s' not declared", node->left->val);
-        semanticError(msg);
-    }
-    sym->is_init = 1;
 }

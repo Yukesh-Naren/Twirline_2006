@@ -10,6 +10,7 @@ Node* parse();
 Node* parse_program();
 Node* parse_statement();
 Node* parse_stmt_list();
+Node* parse_for();
 Node* parse_expr();
 Node* parse_additive();
 Node* parse_term();

@@ -32,6 +32,7 @@ void generate_stmt(Node* node);
 void generate_stmt_list(Node* node);
 void generate_TAC(Node* root);
 void generate_input(Node* root);
+void generate_array_assign(Node* node);
 void print_TAC();
 
 #endif

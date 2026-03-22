@@ -40,6 +40,9 @@ typedef enum {
     FLOAT,  // float(keyword) 35
     CHAR,   // char(keyword) 36
     CHAR_CONST, // character constant 37 
+    LB,     // [ 38
+    RB,     // ] 39
+    FOR,    // for(keyword) 40
 }Tokentype;
 
 typedef struct {

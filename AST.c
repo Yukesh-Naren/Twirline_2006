@@ -13,6 +13,34 @@ Node* CreateNode(char* val, NodeType type){
     return node;
 }
 
+Node* make_array_decl_node(char* name, char* type, char* size) {
+    Node* n = CreateNode("ArrayDeclaration", NODE_ARRAY_DECL);
+
+    n->left = CreateNode(name, NODE_ID);
+    n->left->left = CreateNode(type, NODE_TYPE);
+    n->right = CreateNode(size, NODE_CONST);
+
+    return n;
+}
+
+Node* make_array_access_node(char* name, Node* index) {
+    Node* n = CreateNode("ArrayAccess", NODE_ARRAY_ACCESS);
+
+    n->left = CreateNode(name, NODE_ID);
+    n->right = index;
+
+    return n;
+}
+
+Node* make_array_assign_node(Node* access, Node* expr) {
+    Node* n = CreateNode("ArrayAssignment", NODE_ARRAY_ASSIGN);
+
+    n->left = access;
+    n->right = expr;
+
+    return n;
+}
+
 void printAST(Node* root , int level){
     if (root == NULL) return;
 
