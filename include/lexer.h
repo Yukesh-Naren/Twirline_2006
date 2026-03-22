@@ -38,6 +38,8 @@ typedef enum {
     INPUT,  // input 32
     INT ,   // int (keyword) 34
     FLOAT,  // float(keyword) 35
+    CHAR,   // char(keyword) 36
+    CHAR_CONST, // character constant 37 
 }Tokentype;
 
 typedef struct {

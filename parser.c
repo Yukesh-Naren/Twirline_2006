@@ -52,8 +52,12 @@ Node* parse_declaration(){
     } else if (current_token->type==FLOAT) {
         type_name = "float";
         match(FLOAT);
-    } else {
-        printf("Syntax Error: Expected 'int' or 'float' but got '%s'\n", current_token->lexeme);
+    } else if(current_token->type == CHAR){
+        type_name = "char";
+        match(CHAR);
+    }
+    else {
+        printf("Syntax Error: Expected 'int' or 'float' or 'char' but got '%s'\n", current_token->lexeme);
         exit(1);
     }
     match(RP);
@@ -89,7 +93,7 @@ Node* parse_fact(){
 
         return node;
     }
-    if(current_token->type == NUM_INT || current_token->type ==NUM_FLOAT ){
+    if(current_token->type == NUM_INT || current_token->type ==NUM_FLOAT || current_token->type == CHAR_CONST ){
         Node* node =CreateNode(current_token->lexeme,NODE_CONST);
         advance();
         return node;

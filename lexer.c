@@ -90,7 +90,27 @@ void GetNextToken(FILE* fp)
             Token *t =CreateToken(RP, ")");
             addToken(t);       
         }
-
+        else if(ch == '\'')
+        {
+            int next = getc(fp);
+            if(next == '\'' || next == EOF)
+            {
+                printf("Empty character Included");
+                exit(1);
+            }
+            if(getc(fp)!='\'')
+            {
+                printf("Error: Single quotes contains only a single character");
+                exit(1);
+            }
+            char val[4];
+            val[0] = '\'';
+            val[1] = (char)next;
+            val[2] = '\'';
+            val[3] = '\0';
+            Token *t = CreateToken(CHAR_CONST, val);
+            addToken(t);
+        }
         else if( ch == '"')
         {
             char buffer[50];

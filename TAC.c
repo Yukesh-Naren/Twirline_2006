@@ -112,6 +112,8 @@ int get_expr_type(Node* root)
     if (root == NULL) return TYPE_INT;
 
     if (root->type == NODE_CONST) {
+        if(root->val[0] == '\'' && root->val[2] == '\'')
+        return TYPE_CHAR;
         if (strchr(root->val, '.') != NULL)
             return TYPE_FLOAT;
         return TYPE_INT;

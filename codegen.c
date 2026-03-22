@@ -53,6 +53,10 @@ int is_float_literal(const char* s) {
     return (dot == 1 && digit);
 }
 
+int is_char_literal(const char* s) {
+    return s && s[0] == '\'' && s[1] != '\0' && s[2] == '\'' && s[3] == '\0';
+}
+
 int get_temp_type(const char* name) {
     TAC* temp = tacHead;
 
@@ -136,6 +140,15 @@ void load_as_float(const char* op, const char* freg, const char* treg) {
     }
 }
 
+void load_char_operand(const char* op, const char* reg) {
+    if (is_char_literal(op)) {
+        printf("    li %s, %d\n", reg, op[1]);
+    } else {
+        printf("    la t3, %s\n", op);
+        printf("    lb %s, 0(t3)\n", reg);
+    }
+}
+
 int operand_is_float(const char* op) {
     if (op == NULL || op[0] == '\0') return 0;
 
@@ -159,6 +172,7 @@ void add_var(const char* name) {
     if (name == NULL || name[0] == '\0') return;
     if (is_int_literal(name)) return;
     if (is_float_literal(name)) return;
+    if (is_char_literal(name)) return ; 
     if (strcmp(name, "if") == 0) return;
     if (strcmp(name, "goto") == 0) return;
     if (strcmp(name, "input") == 0) return;
@@ -245,7 +259,13 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    la t3, %s\n", temp->result);
             printf("    fsw ft0, 0(t3)\n");
             return;
-        } else {
+        }else if (temp->type == TYPE_CHAR){
+            load_char_operand(temp->arg1,"t0");
+            printf("    la t3, %s\n", temp->result);
+            printf("    sb t0, 0(t3)\n");
+            return;
+        } 
+        else {
             load_int_operand(temp->arg1, "t0");
             printf("    la t3, %s\n", temp->result);
             printf("    sw t0, 0(t3)\n");
@@ -259,7 +279,15 @@ void generate_riscv_instruction(TAC* temp) {
             printf("    ecall\n");
             printf("    la t3, %s\n", temp->arg1);
             printf("    fsw fa0, 0(t3)\n");
-        } else {
+        }
+        if (temp->type == TYPE_CHAR) {
+            printf("    li a7, 12\n");
+            printf("    ecall\n");
+            printf("    la t3, %s\n", temp->arg1);
+            printf("    sb a0, 0(t3)\n");
+            return;
+        }
+        else {
             printf("    li a7, 5\n");
             printf("    ecall\n");
             printf("    la t3, %s\n", temp->arg1);
@@ -279,6 +307,11 @@ void generate_riscv_instruction(TAC* temp) {
         else if (temp->type == TYPE_FLOAT || is_float_literal(temp->arg1)) {
             load_float_operand(temp->arg1, "fa0");
             printf("    li a7, 2\n");
+            printf("    ecall\n");
+        }
+        else if (temp->type == TYPE_CHAR || is_char_literal(temp->arg1)){
+            load_char_operand(temp->arg1, "a0");
+            printf("    li a7, 11\n");
             printf("    ecall\n");
         }
         else {
@@ -444,11 +477,15 @@ void generate_riscv_code() {
         if (strncmp(vars[i], "tmp", 3) == 0) {
             if (get_temp_type(vars[i]) == TYPE_FLOAT)
                 printf("%s: .float 0.0\n", vars[i]);
+            else if (get_temp_type(vars[i]) == TYPE_CHAR)
+                printf("%s: .byte 0\n", vars[i]);
             else
                 printf("%s: .word 0\n", vars[i]);
         } else {
             if (get_symbol_type(vars[i]) == TYPE_FLOAT)
                 printf("%s: .float 0.0\n", vars[i]);
+            else if (get_temp_type(vars[i]) == TYPE_CHAR)
+                printf("%s: .byte 0\n", vars[i]);
             else
                 printf("%s: .word 0\n", vars[i]);
         }

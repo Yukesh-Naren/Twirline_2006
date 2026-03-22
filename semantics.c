@@ -99,6 +99,8 @@ float evaluate_expression(Node* root)
 
     if (root->type == NODE_CONST)
     {
+        if (root->val[0] == '\'' && root->val[2] == '\'')
+        return ((float)root->val[1]);
         return atof(root->val);
     }
 
@@ -202,11 +204,17 @@ float evaluate_expression(Node* root)
             semanticError(msg);
         }
 
-        if (sym->type == TYPE_INT && strchr(root->right->val, '.') != NULL) {
-         semanticError("Cannot assign float to int variable");
+        float value = evaluate_expression(root->right);
+
+        if (sym->type == TYPE_INT && value != (int)value) {
+            semanticError("Cannot assign float to int variable");
         }
 
-        int value = evaluate_expression(root->right);
+        if (sym->type == TYPE_CHAR) {
+            if (value != (int)value || value < 0 || value > 255) {
+                semanticError("Character value out of range");
+            }
+        }
 
         sym->value = value;
         sym->is_init = 1;
@@ -231,8 +239,10 @@ void check_semantics(Node* root)
 
             if(strcmp(type,"int" )== 0)
             add_symbol(current->left->val, 0 , TYPE_INT);
-            else
+            else if(strcmp(type , "float") == 0)
             add_symbol(current->left->val, 0,TYPE_FLOAT);
+            else if(strcmp(type, "char") == 0)
+            add_symbol(current->left->val, 0 , TYPE_CHAR);
         }
         else if (current->type == NODE_DECL_ASSN)
         {
@@ -240,8 +250,10 @@ void check_semantics(Node* root)
 
             if(strcmp(type,"int") == 0)
             add_symbol(current->left->val, 0 , TYPE_INT);
-            else
+            else if(strcmp(type , "float") == 0)
             add_symbol(current->left->val, 0,TYPE_FLOAT);
+            else if(strcmp(type, "char") == 0)
+            add_symbol(current->left->val, 0 , TYPE_CHAR);
         
             Symbol* sym = lookup_symbol(current->left->left->val);
 
