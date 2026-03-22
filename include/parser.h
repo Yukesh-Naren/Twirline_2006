@@ -24,6 +24,10 @@ Node* parse_declaration_assignment(char* var_name);
 Node* parse_if();
 Node* parse_while();
 Node* parse_block();
+<<<<<<< HEAD
 Node* parse_print();
 Node* parse_input_stmt();
+=======
+Node* parse_while();
+>>>>>>> c0e08d59c24a4fefe4ebbd400716c562c0782a35
 #endif

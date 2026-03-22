@@ -154,6 +154,34 @@ Node* parse_relation(){
     }
     return left;
 }
+Node* parse_while() {
+    match(WHILE); // Match the 'while' keyword
+    match(LP);    // Match '('
+
+    // Parse the condition (logical expression)
+    Node* condNode = parse_logical_or(); 
+
+    match(RP);    // Match ')'
+
+    Node* bodyNode = NULL;
+
+    // Check if the body starts with '{' (START) or is a single statement
+    if (current_token->type == START) {
+        match(START);
+        bodyNode = parse_stmt_list();
+        match(END);
+    } else {
+        bodyNode = parse_statement();
+        match(SEMI); // Ensure semicolon for single-line while
+    }
+
+    // Create the While Node
+    Node* whileNode = CreateNode("while", NODE_WHILE);
+    whileNode->left = condNode;  // Condition goes to the left
+    whileNode->right = bodyNode; // Body goes to the right
+
+    return whileNode;
+}
 
 Node* parse_equal(){
     Node* left = parse_relation();
@@ -383,13 +411,19 @@ Node* parse_statement(){
     }
     else if(current_token->type == IF){
         return parse_if();
+    }    
+    else if (current_token->type == WHILE) { 
+        return parse_while();
     }
+<<<<<<< HEAD
     else if(current_token->type == WHILE){
         return parse_while();
     }
     else if(current_token->type == PRINT){
         return parse_print();
     }
+=======
+>>>>>>> c0e08d59c24a4fefe4ebbd400716c562c0782a35
     else if(current_token->type == START){
         match(START);
         Node* block = parse_stmt_list();

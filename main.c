@@ -22,20 +22,16 @@ int main()
     }
 
     initTokens();
-
     GetNextToken(fp);
-
     for(int i =0 ;i < tokencount; i++)
     printf("%s -> %d \n ", tokens[i]->lexeme , tokens[i]->type);
-
     fclose(fp);
 
     Node* root = parse();
 
     if(root!=NULL){
         printf("\nAST Tree : \n");
-        printProgram(root);
-        
+        printProgram(root);        
     }
      printf("Parsing Successful\n");
 
@@ -57,5 +53,4 @@ int main()
     
     // freeTAC();
     freeAST(root);
-    // freeSymbolTable();
 }
