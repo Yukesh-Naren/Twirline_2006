@@ -7,7 +7,7 @@ typedef enum {
     SEMI,   // ; 
     ADD,    // +
     SUB,    // - 
-    MUL,    // *
+    MUL,    // * 
     DIV,    // /
     MOD,    // %
     LP,     // (

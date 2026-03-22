@@ -224,7 +224,6 @@ void check_semantics(Node* root)
 
         else if (current->type == NODE_IF)
         check_if(current);
-<<<<<<< HEAD
         
         else if (current->type == NODE_WHILE)
         check_while(current);
@@ -235,12 +234,6 @@ void check_semantics(Node* root)
         else if(current->type == NODE_INPUT)
         check_input(current);
 
-=======
-        else if (current->type == NODE_WHILE) // ADD THIS
-        {
-            check_while(current);
-        }
->>>>>>> c0e08d59c24a4fefe4ebbd400716c562c0782a35
         else
         {
             evaluate_expression(current);
@@ -306,7 +299,6 @@ void check_if(Node* node)
 void check_while(Node* node)
 {
     if (node == NULL) return;
-<<<<<<< HEAD
     if (node ->left == NULL){
         semanticError("while condition missing!");
         return;
@@ -328,17 +320,4 @@ void check_input(Node* node)
         semanticError(msg);
     }
     sym->is_init = 1;
-=======
-
-    // 1. Validate the condition expression (e.g., i < 5)
-    // This will throw an error if 'i' isn't declared yet.
-    evaluate_expression(node->left);
-
-    // 2. Validate the body of the loop
-    if (node->right != NULL)
-    {
-        // Use check_semantics to walk through the list of statements inside the loop
-        check_semantics(node->right);
-    }
->>>>>>> c0e08d59c24a4fefe4ebbd400716c562c0782a35
 }
