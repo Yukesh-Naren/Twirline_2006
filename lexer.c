@@ -30,7 +30,7 @@ void addToken(Token *t)
     
     tokens[tokencount++] = t;
 
-    printf("TOKEN[%d]: '%s'\n", tokencount, t->lexeme);
+    // printf("TOKEN[%d]: '%s'\n", tokencount, t->lexeme);
 }
 
 
@@ -343,6 +343,21 @@ void GetNextToken(FILE* fp)
                 Token* t = CreateToken(FOR, buffer);
                 addToken(t);
                 continue;
+            }
+            else if(strcmp(buffer,"function") == 0){
+                Token* t = CreateToken(FUNCTION, buffer);
+                addToken(t);
+                continue;
+            }
+            else if(strcmp(buffer,"return") == 0){
+                Token* t = CreateToken(RETURN , buffer);
+                addToken(t);
+                continue;
+            }
+            else if(strcmp(buffer, "main") == 0){
+                Token *t = CreateToken(MAIN, buffer);
+                addToken(t);
+                continue ;
             }
             Token *t = CreateToken(ID , buffer);
             addToken(t);

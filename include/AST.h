@@ -20,7 +20,13 @@ typedef enum{
     NODE_INPUT,
     NODE_ARRAY_DECL,
     NODE_ARRAY_ACCESS,
-    NODE_ARRAY_ASSIGN
+    NODE_ARRAY_ASSIGN,
+    NODE_FUNC_CALL,
+    NODE_RETURN,
+    NODE_ARG,
+    NODE_PARAM,
+    NODE_FUNC_DEF,
+    NODE_MAIN,
 }NodeType;
 
 typedef struct Node{
@@ -31,6 +37,8 @@ typedef struct Node{
     struct Node* next;
 }Node;
 
+Node* make_array_decl_nd_node(char* name, char* type, Node* dims);
+Node* make_array_access_chain_node(Node* base, Node* index);
 Node* make_array_decl_node(char* name , char* type, char* size);
 Node* make_array_access_node(char* name, Node* indexNode);
 Node* make_array_assign_node(Node* accessNode, Node* valueNode);

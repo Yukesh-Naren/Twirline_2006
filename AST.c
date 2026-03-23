@@ -23,10 +23,29 @@ Node* make_array_decl_node(char* name, char* type, char* size) {
     return n;
 }
 
+Node* make_array_decl_nd_node(char* name, char* type, Node* dims) {
+    Node* n = CreateNode("ArrayDeclaration", NODE_ARRAY_DECL);
+
+    n->left = CreateNode(name, NODE_ID);
+    n->left->left = CreateNode(type, NODE_TYPE);
+    n->right = dims;
+
+    return n;
+}
+
 Node* make_array_access_node(char* name, Node* index) {
     Node* n = CreateNode("ArrayAccess", NODE_ARRAY_ACCESS);
 
     n->left = CreateNode(name, NODE_ID);
+    n->right = index;
+
+    return n;
+}
+
+Node* make_array_access_chain_node(Node* base, Node* index) {
+    Node* n = CreateNode("ArrayAccess", NODE_ARRAY_ACCESS);
+
+    n->left = base;
     n->right = index;
 
     return n;

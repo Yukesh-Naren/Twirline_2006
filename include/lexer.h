@@ -43,6 +43,9 @@ typedef enum {
     LB,     // [ 38
     RB,     // ] 39
     FOR,    // for(keyword) 40
+    FUNCTION, // function (keyword) 41
+    RETURN, //  return (keyword) 42
+    MAIN, // main function 43
 }Tokentype;
 
 typedef struct {

@@ -1,10 +1,8 @@
-a(int)[5];
-i(int);
-x(int);
-
-for(i = 0; i < 5; i = i + 1) start
-    a[i] = i;
+function add(a(int), b(int)) start
+    return a + b;
 end
 
-x = a[3];
-print("x=", x);
+main start
+    x(int);
+    x = add(5);
+end

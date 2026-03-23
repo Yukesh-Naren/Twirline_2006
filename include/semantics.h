@@ -1,40 +1,63 @@
-
 #ifndef SEMANTICS_H
 #define SEMANTICS_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "AST.h"
+#include "ast.h"
 
-#define TYPE_INT 1
+#define TYPE_INT   1
 #define TYPE_FLOAT 2
-#define TYPE_CHAR 3
+#define TYPE_CHAR  3
 
 typedef struct Symbol {
-    char name[50];
+    char name[64];
     int is_init;
-    float value; 
-    int type;         
+    int type;
+    float value;
 
     int is_array;
-    int array_size;
+    int dimensions;
+    int* dim_sizes;
     float* array_values;
     int* array_init;
+
+    int scope_depth;
+
     struct Symbol* next;
 } Symbol;
 
+typedef struct FunctionSymbol {
+    char name[64];
+    int param_count;
+    int return_type;
+    Node* params;
+
+    struct FunctionSymbol* next;
+} FunctionSymbol;
+
+extern Symbol* head;
+extern FunctionSymbol* functionHead;
+
+void semanticError(const char* msg);
+
+void enter_scope();
+void exit_scope();
+
+Symbol* lookup_symbol(char* name);
+Symbol* lookup_symbol_current_scope(char* name);
+
+void add_symbol(char* name, int init, int type);
+void add_symbol_scoped(char* name, int init, int type, int scope_depth);
+
+void add_array_symbol_nd(char* name, int type, Node* dims);
+
+FunctionSymbol* lookup_function(char* name);
+void add_function(char* name, Node* params, int return_type);
+
+int get_node_type_from_decl(Node* typeNode);
+void validate_assignment_type(Symbol* sym, float value);
+
+int compute_offset(Symbol* sym, Node* access);
+float evaluate_expression(Node* node);
 
 void check_semantics(Node* root);
-float evaluate_expression(Node* root);
-int get_symbol_type(const char* name);
-char* checkOpType(char* left, char* right, char* op);
-void semanticError(const char *msg);
-void check_if(Node* node);
-void check_while(Node* node);
-void check_print(Node* node);
-void check_input(Node* node);
-void add_symbol(char* name, int init , int type);
-Symbol* lookup_symbol(char* name);
 void print_symbol_table();
-
 #endif

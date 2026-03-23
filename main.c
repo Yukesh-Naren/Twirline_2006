@@ -23,30 +23,30 @@ int main()
 
     initTokens();
     GetNextToken(fp);
-    for(int i =0 ;i < tokencount; i++)
-    printf("%s -> %d \n ", tokens[i]->lexeme , tokens[i]->type);
+    // for(int i =0 ;i < tokencount; i++)
+    // printf("%s -> %d \n ", tokens[i]->lexeme , tokens[i]->type);
     fclose(fp);
 
     Node* root = parse();
 
-    if(root!=NULL){
-        printf("\nAST Tree : \n");
-        printProgram(root);        
-    }
-     printf("Parsing Successful\n");
+    // if(root!=NULL){
+    //     printf("\nAST Tree : \n");
+    //     printProgram(root);        
+    // }
+    //  printf("Parsing Successful\n");
 
-    printf("\nRunning Semantic Analysis...\n");
+    // printf("\nRunning Semantic Analysis...\n");
 
     check_semantics(root);
-    print_symbol_table();
-    printf("\nSemantic Analysis Completed Successfully\n");
+    // print_symbol_table();
+    // printf("\nSemantic Analysis Completed Successfully\n");
 
-    printf("Starting TAC generation...\n");
+    // printf("Starting TAC generation...\n");
     Node* current = root;
     
     generate_TAC(root);
-    print_TAC();
-    printf("\nThree Address Code is Successful");
+    // print_TAC();
+    // printf("\nThree Address Code is Successful");
     
     generate_riscv_code();
     printf("RISC- V Code Generation Successful\n");
