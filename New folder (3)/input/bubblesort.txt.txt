@@ -1,0 +1,30 @@
+main start
+    arr(int)[5];
+    i(int);
+    j(int);
+    temp(int);
+
+    arr[0] = 5;
+    arr[1] = 2;
+    arr[2] = 4;
+    arr[3] = 1;
+    arr[4] = 3;
+
+    i = 0;
+    while (i < 5) start
+        j = 0;
+        while (j < 4) start
+            if (arr[j] > arr[j+1]) start
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            end
+            j = j + 1;
+        end
+        i = i + 1;
+    end
+
+    k(int);
+    for( k = 0; k < 5; k=k+1)
+    print(arr[k]);
+end

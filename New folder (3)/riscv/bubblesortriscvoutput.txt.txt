@@ -1,0 +1,423 @@
+.data
+tmp1: .word 0
+tmp2: .word 0
+arr: .space 20
+tmp3: .word 0
+tmp4: .word 0
+tmp5: .word 0
+tmp6: .word 0
+tmp7: .word 0
+tmp8: .word 0
+tmp9: .word 0
+tmp10: .word 0
+i: .word 0
+tmp11: .word 0
+j: .word 0
+tmp12: .word 0
+tmp13: .word 0
+tmp14: .word 0
+tmp15: .word 0
+tmp16: .word 0
+tmp17: .word 0
+tmp18: .word 0
+tmp19: .word 0
+tmp20: .word 0
+tmp21: .word 0
+tmp22: .word 0
+tmp23: .word 0
+temp: .word 0
+tmp24: .word 0
+tmp25: .word 0
+tmp26: .word 0
+tmp27: .word 0
+tmp28: .word 0
+tmp29: .word 0
+tmp30: .word 0
+tmp31: .word 0
+tmp32: .word 0
+tmp33: .word 0
+tmp34: .word 0
+k: .word 0
+tmp35: .word 0
+tmp36: .word 0
+tmp37: .word 0
+tmp38: .word 0
+tmp39: .word 0
+
+.text
+.globl main
+main:
+    jal ra, __user_main      
+    li a7, 10
+    ecall
+__user_main:
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    li t0, 0
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp1
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp1
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp2
+    sw t2, 0(t3)
+    la t3, tmp2
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    li t5, 5
+    sw t5, 0(t4)
+    li t0, 1
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp3
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp3
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp4
+    sw t2, 0(t3)
+    la t3, tmp4
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    li t5, 2
+    sw t5, 0(t4)
+    li t0, 2
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp5
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp5
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp6
+    sw t2, 0(t3)
+    la t3, tmp6
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    li t5, 4
+    sw t5, 0(t4)
+    li t0, 3
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp7
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp7
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp8
+    sw t2, 0(t3)
+    la t3, tmp8
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    li t5, 1
+    sw t5, 0(t4)
+    li t0, 4
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp9
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp9
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp10
+    sw t2, 0(t3)
+    la t3, tmp10
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    li t5, 3
+    sw t5, 0(t4)
+    li t0, 0
+    la t3, i
+    sw t0, 0(t3)
+L1:
+    la t3, i
+    lw t0, 0(t3)
+    li t1, 5
+    slt t2, t0, t1
+    la t3, tmp11
+    sw t2, 0(t3)
+    la t3, tmp11
+    lw t0, 0(t3)
+    bne t0, x0, L2
+    j L3
+L2:
+    li t0, 0
+    la t3, j
+    sw t0, 0(t3)
+L4:
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 4
+    slt t2, t0, t1
+    la t3, tmp12
+    sw t2, 0(t3)
+    la t3, tmp12
+    lw t0, 0(t3)
+    bne t0, x0, L5
+    j L6
+L5:
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp13
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp13
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp14
+    sw t2, 0(t3)
+    la t3, tmp14
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    lw t5, 0(t4)
+    la t3, tmp15
+    sw t5, 0(t3)
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp16
+    sw t2, 0(t3)
+    la t3, tmp16
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp17
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp17
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp18
+    sw t2, 0(t3)
+    la t3, tmp18
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    lw t5, 0(t4)
+    la t3, tmp19
+    sw t5, 0(t3)
+    la t3, tmp15
+    lw t0, 0(t3)
+    la t3, tmp19
+    lw t1, 0(t3)
+    slt t2, t1, t0
+    la t3, tmp20
+    sw t2, 0(t3)
+    la t3, tmp20
+    lw t0, 0(t3)
+    bne t0, x0, L7
+    j L8
+L7:
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp21
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp21
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp22
+    sw t2, 0(t3)
+    la t3, tmp22
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    lw t5, 0(t4)
+    la t3, tmp23
+    sw t5, 0(t3)
+    la t3, tmp23
+    lw t0, 0(t3)
+    la t3, temp
+    sw t0, 0(t3)
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp24
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp24
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp25
+    sw t2, 0(t3)
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp26
+    sw t2, 0(t3)
+    la t3, tmp26
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp27
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp27
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp28
+    sw t2, 0(t3)
+    la t3, tmp28
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    lw t5, 0(t4)
+    la t3, tmp29
+    sw t5, 0(t3)
+    la t3, tmp25
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    la t3, tmp29
+    lw t5, 0(t3)
+    sw t5, 0(t4)
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp30
+    sw t2, 0(t3)
+    la t3, tmp30
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp31
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp31
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp32
+    sw t2, 0(t3)
+    la t3, tmp32
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    la t3, temp
+    lw t5, 0(t3)
+    sw t5, 0(t4)
+    j L9
+L8:
+L9:
+    la t3, j
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp33
+    sw t2, 0(t3)
+    la t3, tmp33
+    lw t0, 0(t3)
+    la t3, j
+    sw t0, 0(t3)
+    j L4
+L6:
+    la t3, i
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp34
+    sw t2, 0(t3)
+    la t3, tmp34
+    lw t0, 0(t3)
+    la t3, i
+    sw t0, 0(t3)
+    j L1
+L3:
+    li t0, 0
+    la t3, k
+    sw t0, 0(t3)
+L10:
+    la t3, k
+    lw t0, 0(t3)
+    li t1, 5
+    slt t2, t0, t1
+    la t3, tmp35
+    sw t2, 0(t3)
+    la t3, tmp35
+    lw t0, 0(t3)
+    bne t0, x0, L11
+    j L12
+L11:
+    la t3, k
+    lw t0, 0(t3)
+    li t1, 1
+    mul t2, t0, t1
+    la t3, tmp36
+    sw t2, 0(t3)
+    li t0, 0
+    la t3, tmp36
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp37
+    sw t2, 0(t3)
+    la t3, tmp37
+    lw t0, 0(t3)
+    li t1, 4
+    mul t2, t0, t1
+    la t3, arr
+    add t4, t3, t2
+    lw t5, 0(t4)
+    la t3, tmp38
+    sw t5, 0(t3)
+    la t3, tmp38
+    lw a0, 0(t3)
+    li a7, 1
+    ecall
+    la t3, k
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp39
+    sw t2, 0(t3)
+    la t3, tmp39
+    lw t0, 0(t3)
+    la t3, k
+    sw t0, 0(t3)
+    j L10
+L12:
+__user_main_end:
+    lw ra, 12(sp)
+    addi sp, sp, 16
+    ret

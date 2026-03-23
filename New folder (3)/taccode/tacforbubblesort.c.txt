@@ -1,0 +1,80 @@
+func main
+tmp1 = 0 * 1
+tmp2 = 0 + tmp1
+arr[tmp2] = 5
+tmp3 = 1 * 1
+tmp4 = 0 + tmp3
+arr[tmp4] = 2
+tmp5 = 2 * 1
+tmp6 = 0 + tmp5
+arr[tmp6] = 4
+tmp7 = 3 * 1
+tmp8 = 0 + tmp7
+arr[tmp8] = 1
+tmp9 = 4 * 1
+tmp10 = 0 + tmp9
+arr[tmp10] = 3
+i = 0
+L1:
+tmp11 = i < 5
+if tmp11 goto L2
+goto L3
+L2:
+j = 0
+L4:
+tmp12 = j < 4
+if tmp12 goto L5
+goto L6
+L5:
+tmp13 = j * 1
+tmp14 = 0 + tmp13
+tmp15 = arr[tmp14]
+tmp16 = j + 1
+tmp17 = tmp16 * 1
+tmp18 = 0 + tmp17
+tmp19 = arr[tmp18]
+tmp20 = tmp15 > tmp19        
+if tmp20 goto L7
+goto L8
+L7:
+tmp21 = j * 1
+tmp22 = 0 + tmp21
+tmp23 = arr[tmp22]
+temp = tmp23
+tmp24 = j * 1
+tmp25 = 0 + tmp24
+tmp26 = j + 1
+tmp27 = tmp26 * 1
+tmp28 = 0 + tmp27
+tmp29 = arr[tmp28]
+arr[tmp25] = tmp29
+tmp30 = j + 1
+tmp31 = tmp30 * 1
+tmp32 = 0 + tmp31
+arr[tmp32] = temp
+goto L9
+L8:
+L9:
+tmp33 = j + 1
+j = tmp33
+goto L4
+L6:
+tmp34 = i + 1
+i = tmp34
+goto L1
+L3:
+k = 0
+L10:
+tmp35 = k < 5
+if tmp35 goto L11
+goto L12
+L11:
+tmp36 = k * 1
+tmp37 = 0 + tmp36
+tmp38 = arr[tmp37]
+print tmp38
+tmp39 = k + 1
+k = tmp39
+goto L10
+L12:
+endfunc main
