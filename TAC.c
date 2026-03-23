@@ -581,10 +581,12 @@ void generate_if(Node* node)
 
         emit_label(trueLabel);
 
-        if (node->right != NULL && node->right->type == NODE_ELSE)
+        if (node->right != NULL) {
+            if (node->right->type == NODE_ELSE)
             generate_stmt_list(node->right->left);
-        else
-            generate_stmt(node->right);
+            else
+            generate_stmt_list(node->right);   // ✅ FIX HERE
+        }
 
         emit_goto(endLabel);
         emit_label(falseLabel);
@@ -716,12 +718,7 @@ void generate_TAC(Node* root)
     tempcount = 1;
     labelcount = 1;
 
-    Node* curr = root;
-    while (curr != NULL)
-    {
-        generate_stmt(curr);
-        curr = curr->next;
-    }
+    generate_stmt_list(root);
 }
 
 void print_TAC()

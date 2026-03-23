@@ -45,8 +45,8 @@ int main()
     Node* current = root;
     
     generate_TAC(root);
-    // print_TAC();
-    // printf("\nThree Address Code is Successful");
+    print_TAC();
+    printf("\nThree Address Code is Successful");
     
     generate_riscv_code();
     printf("RISC- V Code Generation Successful\n");

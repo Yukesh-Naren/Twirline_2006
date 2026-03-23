@@ -981,8 +981,6 @@ Node* parse_stmt_list()
         if (stmtNode == NULL)
             continue;
 
-        stmtNode->next = NULL;
-
         if (head == NULL) {
             head = stmtNode;
             tail = stmtNode;
