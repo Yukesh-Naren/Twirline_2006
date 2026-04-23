@@ -665,8 +665,9 @@ Node* parse_print()
 
 Node* parse_input_stmt()
 {
-    Node* idNode;
+    Node* targetNode;
     Node* inNode;
+    char name[100];
 
     match(INPUT);
     expect_token(LP, "expected '(' after input");
@@ -674,14 +675,41 @@ Node* parse_input_stmt()
     if (current_token->type != ID)
         syntax_error("expected identifier inside input()");
 
-    idNode = CreateNode(current_token->lexeme, NODE_ID);
+    strcpy(name, current_token->lexeme);
     advance();
+
+    if (current_token->type == LB) {
+        Node* indexList = NULL;
+        Node* indexTail = NULL;
+
+        while (current_token->type == LB) {
+            Node* idx;
+
+            match(LB);
+            idx = parse_expr();
+            expect_token(RB, "expected ']' after array index");
+
+            idx->next = NULL;
+            if (indexList == NULL) {
+                indexList = idx;
+                indexTail = idx;
+            } else {
+                indexTail->next = idx;
+                indexTail = idx;
+            }
+        }
+
+        targetNode = make_array_access_node(name, indexList);
+    } 
+    else {
+        targetNode = CreateNode(name, NODE_ID);
+    }
 
     expect_token(RP, "expected ')' after input argument");
     expect_token(SEMI, "expected ';' after input");
 
     inNode = CreateNode("input", NODE_INPUT);
-    inNode->left = idNode;
+    inNode->left = targetNode;
 
     return inNode;
 }

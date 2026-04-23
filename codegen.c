@@ -6,8 +6,16 @@
 #include "tac.h"
 #include "semantics.h"
 
+FILE* out;
 #define MAX_VARS 500
 #define MAX_PARAMS 50
+
+// #define EMIT(...) do{ \
+//     fprintf(out, __VA_ARGS__); \
+//     printf(__VA_ARGS__); \
+// }while(0)
+
+#define EMIT(...) fprintf(out, __VA_ARGS__);
 
 extern TAC* tacHead;
 extern FunctionSymbol* functionHead;
@@ -158,12 +166,12 @@ int get_identifier_type_codegen(const char* name) {
 
 void load_int_operand(const char* op, const char* reg) {
     if (is_int_literal(op)) {
-        printf("    li %s, %s\n", reg, op);
+        EMIT("    li %s, %s\n", reg, op);
     } else if (is_char_literal(op)) {
-        printf("    li %s, %d\n", reg, op[1]);
+        EMIT("    li %s, %d\n", reg, op[1]);
     } else {
-        printf("    la t3, %s\n", op);
-        printf("    lw %s, 0(t3)\n", reg);
+        EMIT("    la t3, %s\n", op);
+        EMIT("    lw %s, 0(t3)\n", reg);
     }
 }
 
@@ -171,11 +179,11 @@ void load_float_operand(const char* op, const char* reg) {
     int idx = exists_float_const(op);
 
     if (idx != -1) {
-        printf("    la t3, fconst%d\n", idx);
-        printf("    flw %s, 0(t3)\n", reg);
+        EMIT("    la t3, fconst%d\n", idx);
+        EMIT("    flw %s, 0(t3)\n", reg);
     } else {
-        printf("    la t3, %s\n", op);
-        printf("    flw %s, 0(t3)\n", reg);
+        EMIT("    la t3, %s\n", op);
+        EMIT("    flw %s, 0(t3)\n", reg);
     }
 }
 
@@ -184,29 +192,30 @@ void load_as_float(const char* op, const char* freg, const char* treg) {
         load_float_operand(op, freg);
     }
     else if (is_int_literal(op)) {
-        printf("    li %s, %s\n", treg, op);
-        printf("    fcvt.s.w %s, %s\n", freg, treg);
+        EMIT("    li %s, %s\n", treg, op);
+        EMIT("    fcvt.s.w %s, %s\n", freg, treg);
     }
     else if (is_char_literal(op)) {
-        printf("    li %s, %d\n", treg, op[1]);
-        printf("    fcvt.s.w %s, %s\n", freg, treg);
+        EMIT("    li %s, %d\n", treg, op[1]);
+        EMIT("    fcvt.s.w %s, %s\n", freg, treg);
     }
     else if (get_identifier_type_codegen(op) == TYPE_FLOAT) {
         load_float_operand(op, freg);
     }
     else {
-        printf("    la t3, %s\n", op);
-        printf("    lw %s, 0(t3)\n", treg);
-        printf("    fcvt.s.w %s, %s\n", freg, treg);
+        EMIT("    la t3, %s\n", op);
+        EMIT("    lw %s, 0(t3)\n", treg);
+        EMIT("    fcvt.s.w %s, %s\n", freg, treg);
     }
 }
 
 void load_char_operand(const char* op, const char* reg) {
     if (is_char_literal(op)) {
-        printf("    li %s, %d\n", reg, op[1]);
-    } else {
-        printf("    la t3, %s\n", op);
-        printf("    lb %s, 0(t3)\n", reg);
+        EMIT("    li %s, %d\n", reg, op[1]);
+    } 
+    else {
+        EMIT("    la t3, %s\n", op);
+        EMIT("    lb %s, 0(t3)\n", reg);
     }
 }
 
@@ -245,6 +254,8 @@ void add_var(const char* name) {
     if (strcmp(name, "print") == 0) return;
     if (strcmp(name, "param") == 0) return;
     if (strcmp(name, "return") == 0) return;
+    if (strcmp(name, "[]input") == 0) return;
+    if (strcmp(name, "ArrayAccess") == 0) return; 
     if (exists_var(name)) return;
 
     if (varCount >= MAX_VARS)
@@ -355,22 +366,22 @@ static void load_address_of_array_like(const char* name, const char* reg) {
     Symbol* sym = lookup_symbol((char*)name);
 
     if (sym != NULL && sym->is_array && !is_array_param_name_codegen(name)) {
-        printf("    la %s, %s\n", reg, name);
+        EMIT("    la %s, %s\n", reg, name);
         return;
     }
 
     if (is_array_param_name_codegen(name)) {
-        printf("    la t3, %s\n", name);
-        printf("    lw %s, 0(t3)\n", reg);
+        EMIT("    la t3, %s\n", name);
+        EMIT("    lw %s, 0(t3)\n", reg);
         return;
     }
 
-    printf("    la %s, %s\n", reg, name);
+    EMIT("    la %s, %s\n", reg, name);
 }
 
 static void emit_store_word(const char* name, const char* reg) {
-    printf("    la t3, %s\n", name);
-    printf("    sw %s, 0(t3)\n", reg);
+    EMIT("    la t3, %s\n", name);
+    EMIT("    sw %s, 0(t3)\n", reg);
 }
 
 void generate_riscv_instruction(TAC* temp) {
@@ -378,35 +389,35 @@ void generate_riscv_instruction(TAC* temp) {
 
     if (strcmp(temp->result, "if") == 0 && strcmp(temp->op, "goto") == 0) {
         load_int_operand(temp->arg1, "t0");
-        printf("    bne t0, x0, %s\n", temp->arg2);
+        EMIT("    bne t0, x0, %s\n", temp->arg2);
         return;
     }
 
     if (strcmp(temp->result, "goto") == 0) {
-        printf("    j %s\n", temp->arg1);
+        EMIT("    j %s\n", temp->arg1);
         return;
     }
 
     if (strcmp(temp->op, "label") == 0) {
-        printf("%s:\n", temp->result);
+        EMIT("%s:\n", temp->result);
         return;
     }
 
     if (strcmp(temp->op, "func") == 0) {
         strcpy(currentFunction, temp->result);
-        printf("%s:\n", asm_func_label(temp->result));
-        printf("    addi sp, sp, -16\n");
-        printf("    sw ra, 12(sp)\n");
+        EMIT("%s:\n", asm_func_label(temp->result));
+        EMIT("    addi sp, sp, -16\n");
+        EMIT("    sw ra, 12(sp)\n");
         return;
     }
 
     if (strcmp(temp->op, "endfunc") == 0) {
         char endLabel[80];
         asm_func_end_label(temp->result, endLabel);
-        printf("%s:\n", endLabel);
-        printf("    lw ra, 12(sp)\n");
-        printf("    addi sp, sp, 16\n");
-        printf("    ret\n");
+        EMIT("%s:\n", endLabel);
+        EMIT("    lw ra, 12(sp)\n");
+        EMIT("    addi sp, sp, 16\n");
+        EMIT("    ret\n");
         currentFunction[0] = '\0';
         return;
     }
@@ -435,25 +446,25 @@ void generate_riscv_instruction(TAC* temp) {
                 Symbol* sym = lookup_symbol((char*)pendingParams[i]);
 
                 if (sym != NULL && sym->is_array && !is_array_param_name_codegen(pendingParams[i])) {
-                    printf("    la t0, %s\n", pendingParams[i]);
+                    EMIT("    la t0, %s\n", pendingParams[i]);
                 }
                 else if (is_array_param_name_codegen(pendingParams[i])) {
-                    printf("    la t3, %s\n", pendingParams[i]);
-                    printf("    lw t0, 0(t3)\n");
+                    EMIT("    la t3, %s\n", pendingParams[i]);
+                    EMIT("    lw t0, 0(t3)\n");
                 }
                 else {
-                    printf("    la t0, %s\n", pendingParams[i]);
+                    EMIT("    la t0, %s\n", pendingParams[i]);
                 }
 
-                printf("    mv a%d, t0\n", i);
+                EMIT("    mv a%d, t0\n", i);
             } else {
                 load_int_operand(pendingParams[i], "t0");
-                printf("    mv a%d, t0\n", i);
+                EMIT("    mv a%d, t0\n", i);
             }
         }
 
         pendingParamCount = 0;
-        printf("    jal ra, %s\n", asm_func_label(temp->arg1));
+        EMIT("    jal ra, %s\n", asm_func_label(temp->arg1));
         emit_store_word(temp->result, "a0");
         return;
     }
@@ -462,10 +473,10 @@ void generate_riscv_instruction(TAC* temp) {
         char endLabel[80];
         if (temp->arg1[0] != '\0') {
             load_int_operand(temp->arg1, "t0");
-            printf("    mv a0, t0\n");
+            EMIT("    mv a0, t0\n");
         }
         asm_func_end_label(currentFunction, endLabel);
-        printf("    j %s\n", endLabel);
+        EMIT("    j %s\n", endLabel);
         return;
     }
 
@@ -477,36 +488,67 @@ void generate_riscv_instruction(TAC* temp) {
 
     if (strcmp(temp->op, "=[]") == 0) {
         load_int_operand(temp->arg2, "t0");
-        printf("    li t1, 4\n");
-        printf("    mul t2, t0, t1\n");
+        EMIT("    li t1, 4\n");
+        EMIT("    mul t2, t0, t1\n");
         load_address_of_array_like(temp->arg1, "t3");
-        printf("    add t4, t3, t2\n");
-        printf("    lw t5, 0(t4)\n");
+        EMIT("    add t4, t3, t2\n");
+        EMIT("    lw t5, 0(t4)\n");
         emit_store_word(temp->result, "t5");
         return;
     }
 
     if (strcmp(temp->op, "[]=") == 0) {
         load_int_operand(temp->arg1, "t0");
-        printf("    li t1, 4\n");
-        printf("    mul t2, t0, t1\n");
+        EMIT("    li t1, 4\n");
+        EMIT("    mul t2, t0, t1\n");
         load_address_of_array_like(temp->result, "t3");
-        printf("    add t4, t3, t2\n");
+        EMIT("    add t4, t3, t2\n");
         load_int_operand(temp->arg2, "t5");
-        printf("    sw t5, 0(t4)\n");
+        EMIT("    sw t5, 0(t4)\n");
+        return;
+    }
+
+    if (strcmp(temp->result, "input") == 0) {
+        EMIT("    li a7, 5\n");
+        EMIT("    ecall\n");
+        EMIT("    la t3, %s\n", temp->arg1);
+        EMIT("    sw a0, 0(t3)\n");
+        return;
+    }
+
+    if (strcmp(temp->op, "[]input") == 0) {
+        EMIT("    li a7, 5\n");
+        EMIT("    ecall\n");
+
+        load_int_operand(temp->arg1, "t0");
+        EMIT("    li t1, 4\n");
+        EMIT("    mul t2, t0, t1\n");
+        load_address_of_array_like(temp->result, "t3");
+        EMIT("    add t4, t3, t2\n");
+        EMIT("    sw a0, 0(t4)\n");
         return;
     }
 
     if (strcmp(temp->result, "print") == 0) {
-        load_int_operand(temp->arg1, "a0");
-        printf("    li a7, 1\n");
-        printf("    ecall\n");
+        int idx = exists_string(temp->arg1);
+
+        if(idx != -1){
+            EMIT("    la a0, str%d\n",idx);
+            EMIT("    li a7, 4\n");
+            EMIT("    ecall\n");
+        }
+        else
+        {
+            load_int_operand(temp->arg1, "a0");
+            EMIT("    li a7, 1\n");
+            EMIT("    ecall\n");
+        }
         return;
     }
 
     if (strcmp(temp->op, "!") == 0) {
         load_int_operand(temp->arg1, "t0");
-        printf("    seqz t1, t0\n");
+        EMIT("    seqz t1, t0\n");
         emit_store_word(temp->result, "t1");
         return;
     }
@@ -515,51 +557,51 @@ void generate_riscv_instruction(TAC* temp) {
     load_int_operand(temp->arg2, "t1");
 
     if (strcmp(temp->op, "+") == 0) {
-        printf("    add t2, t0, t1\n");
+        EMIT("    add t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "-") == 0) {
-        printf("    sub t2, t0, t1\n");
+        EMIT("    sub t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "*") == 0) {
-        printf("    mul t2, t0, t1\n");
+        EMIT("    mul t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "/") == 0) {
-        printf("    div t2, t0, t1\n");
+        EMIT("    div t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "%") == 0) {
-        printf("    rem t2, t0, t1\n");
+        EMIT("    rem t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "<") == 0) {
-        printf("    slt t2, t0, t1\n");
+        EMIT("    slt t2, t0, t1\n");
     }
     else if (strcmp(temp->op, ">") == 0) {
-        printf("    slt t2, t1, t0\n");
+        EMIT("    slt t2, t1, t0\n");
     }
     else if (strcmp(temp->op, "<=") == 0) {
-        printf("    slt t2, t1, t0\n");
-        printf("    xori t2, t2, 1\n");
+        EMIT("    slt t2, t1, t0\n");
+        EMIT("    xori t2, t2, 1\n");
     }
     else if (strcmp(temp->op, ">=") == 0) {
-        printf("    slt t2, t0, t1\n");
-        printf("    xori t2, t2, 1\n");
+        EMIT("    slt t2, t0, t1\n");
+        EMIT("    xori t2, t2, 1\n");
     }
     else if (strcmp(temp->op, "==") == 0) {
-        printf("    sub t2, t0, t1\n");
-        printf("    seqz t2, t2\n");
+        EMIT("    sub t2, t0, t1\n");
+        EMIT("    seqz t2, t2\n");
     }
     else if (strcmp(temp->op, "!=") == 0) {
-        printf("    sub t2, t0, t1\n");
-        printf("    snez t2, t2\n");
+        EMIT("    sub t2, t0, t1\n");
+        EMIT("    snez t2, t2\n");
     }
     else if (strcmp(temp->op, "&&") == 0) {
-        printf("    snez t0, t0\n");
-        printf("    snez t1, t1\n");
-        printf("    and t2, t0, t1\n");
+        EMIT("    snez t0, t0\n");
+        EMIT("    snez t1, t1\n");
+        EMIT("    and t2, t0, t1\n");
     }
     else if (strcmp(temp->op, "||") == 0) {
-        printf("    snez t0, t0\n");
-        printf("    snez t1, t1\n");
-        printf("    or t2, t0, t1\n");
+        EMIT("    snez t0, t0\n");
+        EMIT("    snez t1, t1\n");
+        EMIT("    or t2, t0, t1\n");
     }
     else {
         return;
@@ -588,41 +630,48 @@ void generate_riscv_code() {
         }
         temp = temp->next;
     }
-
-    printf("\n.data\n");
+    out = fopen("output.s","w");
+    if(!out){
+        printf("Error opening output file\n");
+        return;
+    }
+    EMIT("\n.data\n");
 
     for (int i = 0; i < floatConstCount; i++) {
-        printf("fconst%d: .float %s\n", i, floatConsts[i]);
+        EMIT("fconst%d: .float %s\n", i, floatConsts[i]);
     }
 
+    for (int i = 0; i < stringCount; i++){
+        EMIT("str%d: .asciz \"%s\"\n", i, strings[i]);
+    }
     for (int i = 0; i < varCount; i++) {
         if (strncmp(vars[i], "tmp", 3) == 0) {
-            printf("%s: .word 0\n", vars[i]);
+            EMIT("%s: .word 0\n", vars[i]);
         } else {
             Symbol* sym = lookup_symbol(vars[i]);
 
             if (is_array_param_name_codegen(vars[i])) {
-                printf("%s: .word 0\n", vars[i]);
+                EMIT("%s: .word 0\n", vars[i]);
             }
             else if (sym && sym->is_array) {
                 int total = get_array_total_size(sym);
                 int elemSize = get_array_elem_size(sym);
-                printf("%s: .space %d\n", vars[i], total * elemSize);
+                EMIT("%s: .space %d\n", vars[i], total * elemSize);
             }
             else {
-                printf("%s: .word 0\n", vars[i]);
+                EMIT("%s: .word 0\n", vars[i]);
             }
         }
     }
 
-    printf("\n.text\n");
-    printf(".globl main\n");
-    printf("main:\n");
+    EMIT("\n.text\n");
+    EMIT(".globl main\n");
+    EMIT("main:\n");
 
     if (hasUserMain) {
-        printf("    jal ra, __user_main\n");
-        printf("    li a7, 10\n");
-        printf("    ecall\n");
+        EMIT("    jal ra, __user_main\n");
+        EMIT("    li a7, 10\n");
+        EMIT("    ecall\n");
     }
 
     temp = tacHead;
@@ -632,7 +681,8 @@ void generate_riscv_code() {
     }
 
     if (!hasUserMain) {
-        printf("    li a7, 10\n");
-        printf("    ecall\n");
+        EMIT("    li a7, 10\n");
+        EMIT("    ecall\n");
     }
+    fclose(out);
 }

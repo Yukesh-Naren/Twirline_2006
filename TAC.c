@@ -613,7 +613,13 @@ void generate_input(Node* node)
     if (node == NULL || node->left == NULL)
         return;
 
-    appendTAC(CreateTAC("input", node->left->val, "", "", get_expr_type(node->left)));
+    if (node->left->type == NODE_ID) {
+        appendTAC(CreateTAC("input", node->left->val, "", "", get_expr_type(node->left)));
+    }
+    else if (node->left->type == NODE_ARRAY_ACCESS) {
+        char* indexTemp = generate_expr(node->left->right);
+        appendTAC(CreateTAC(node->left->left->val, indexTemp, "[]input", "", get_expr_type(node->left)));
+    }
 }
 
 void generate_print(Node* node)

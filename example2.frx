@@ -1,0 +1,51 @@
+main start
+
+    n(int);
+    i(int);
+    j(int);
+    temp(int);
+
+    print("Enter number of elements:");
+    input(n);
+
+    a(int)[10];
+
+    i = 0;
+
+    print("Enter elements:");
+
+    while (i < n) start
+        input(a[i]);
+        i = i + 1;
+    end
+
+    i = 0;
+
+    while (i < n - 1) start
+        j = 0;
+
+        while (j < n - i - 1) start
+
+            if (a[j] > a[j + 1]) start
+                temp = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            end
+
+            j = j + 1;
+
+        end
+
+        i = i + 1;
+    end
+
+    print("Sorted Array:");
+
+    i = 0;
+
+    while (i < n) start
+        print(a[i]);
+        i = i + 1;
+    end
+
+end

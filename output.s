@@ -1,0 +1,144 @@
+
+.data
+n: .word 0
+tmp1: .word 0
+tmp2: .word 0
+a: .word 0
+b: .word 0
+i: .word 0
+tmp3: .word 0
+tmp4: .word 0
+c: .word 0
+tmp5: .word 0
+tmp6: .word 0
+result: .word 0
+
+.text
+.globl main
+main:
+    jal ra, __user_main
+    li a7, 10
+    ecall
+fib:
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    la t3, n
+    sw a0, 0(t3)
+    la t3, n
+    lw t0, 0(t3)
+    li t1, 1
+    sub t2, t0, t1
+    seqz t2, t2
+    la t3, tmp1
+    sw t2, 0(t3)
+    la t3, tmp1
+    lw t0, 0(t3)
+    bne t0, x0, L1
+    j L2
+L1:
+    li t0, 0
+    mv a0, t0
+    j fib_end
+    j L3
+L2:
+L3:
+    la t3, n
+    lw t0, 0(t3)
+    li t1, 2
+    sub t2, t0, t1
+    seqz t2, t2
+    la t3, tmp2
+    sw t2, 0(t3)
+    la t3, tmp2
+    lw t0, 0(t3)
+    bne t0, x0, L4
+    j L5
+L4:
+    li t0, 1
+    mv a0, t0
+    j fib_end
+    j L6
+L5:
+L6:
+    li t0, 0
+    la t3, a
+    sw t0, 0(t3)
+    li t0, 1
+    la t3, b
+    sw t0, 0(t3)
+    li t0, 3
+    la t3, i
+    sw t0, 0(t3)
+L7:
+    la t3, i
+    lw t0, 0(t3)
+    la t3, n
+    lw t1, 0(t3)
+    slt t2, t1, t0
+    xori t2, t2, 1
+    la t3, tmp3
+    sw t2, 0(t3)
+    la t3, tmp3
+    lw t0, 0(t3)
+    bne t0, x0, L8
+    j L9
+L8:
+    la t3, a
+    lw t0, 0(t3)
+    la t3, b
+    lw t1, 0(t3)
+    add t2, t0, t1
+    la t3, tmp4
+    sw t2, 0(t3)
+    la t3, tmp4
+    lw t0, 0(t3)
+    la t3, c
+    sw t0, 0(t3)
+    la t3, b
+    lw t0, 0(t3)
+    la t3, a
+    sw t0, 0(t3)
+    la t3, c
+    lw t0, 0(t3)
+    la t3, b
+    sw t0, 0(t3)
+    la t3, i
+    lw t0, 0(t3)
+    li t1, 1
+    add t2, t0, t1
+    la t3, tmp5
+    sw t2, 0(t3)
+    la t3, tmp5
+    lw t0, 0(t3)
+    la t3, i
+    sw t0, 0(t3)
+    j L7
+L9:
+    la t3, b
+    lw t0, 0(t3)
+    mv a0, t0
+    j fib_end
+fib_end:
+    lw ra, 12(sp)
+    addi sp, sp, 16
+    ret
+__user_main:
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    li t0, 10
+    mv a0, t0
+    jal ra, fib
+    la t3, tmp6
+    sw a0, 0(t3)
+    la t3, tmp6
+    lw t0, 0(t3)
+    la t3, result
+    sw t0, 0(t3)
+    la t3, result
+    lw a0, 0(t3)
+    li a7, 1
+    ecall
+__user_main_end:
+    lw ra, 12(sp)
+    addi sp, sp, 16
+    ret

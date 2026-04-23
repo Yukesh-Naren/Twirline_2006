@@ -1,0 +1,44 @@
+[
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\main.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\main.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/main.c",
+  "output": "CMakeFiles/ferrox.dir/main.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\lexer.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\lexer.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/lexer.c",
+  "output": "CMakeFiles/ferrox.dir/lexer.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\parser.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\parser.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/parser.c",
+  "output": "CMakeFiles/ferrox.dir/parser.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\ast.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\ast.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/ast.c",
+  "output": "CMakeFiles/ferrox.dir/ast.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\semantics.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\semantics.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/semantics.c",
+  "output": "CMakeFiles/ferrox.dir/semantics.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\TAC.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\TAC.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/TAC.c",
+  "output": "CMakeFiles/ferrox.dir/TAC.c.obj"
+},
+{
+  "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\codegen.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\codegen.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/codegen.c",
+  "output": "CMakeFiles/ferrox.dir/codegen.c.obj"
+}
+]

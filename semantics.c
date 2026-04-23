@@ -254,19 +254,28 @@ void add_array_param_symbol(char* name, int type, Node* dims)
     add_array_param_symbol_scoped(name, type, dims, current_scope_depth);
 }
 
+const char* type_to_string(int type){
+    switch(type){
+        case TYPE_INT: return "int";
+        case TYPE_FLOAT: return "float";
+        case TYPE_CHAR:return "char";
+        default: return "unknown";
+    }
+}
 void print_symbol_table()
 {
     printf("\n===== SYMBOL TABLE =====\n");
-    printf("%-10s %-10s %-10s %-10s %-10s %-10s %-10s\n",
-           "NAME", "INIT", "VALUE", "ARRAY", "DIMS", "SCOPE", "SIZES");
+    printf("%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s\n",
+           "NAME", "TYPE","INIT", "VALUE", "ARRAY", "DIMS", "SCOPE", "SIZES");
     printf("-----------------------------------------------------------------------------------------\n");
 
     Symbol* temp = head;
 
     while (temp != NULL)
     {
-        printf("%-10s %-10d %-10.2f %-10d %-10d %-10d ",
+        printf("%-10s %-10s %-10d %-10.2f %-10d %-10d %-10d ",
                temp->name,
+               type_to_string(temp->type),
                temp->is_init,
                temp->value,
                temp->is_array,

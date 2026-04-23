@@ -1,18 +1,39 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include "lexer.h"
 #include "parser.h"
 #include "AST.h"
 #include "semantics.h"
 #include "TAC.h"
 #include "codegen.h"
-int main()
+#include <string.h>
+
+int has_frx_extension(const char *filename) {
+    int len = strlen(filename);
+
+    if (len < 4)
+        return 0;
+
+    return strcmp(filename + len - 4, ".frx") == 0;
+}
+
+
+int main(int argc, char* argv[])
 {
+    if(argc < 2)
+    {
+        printf("Usage: ferrox <source_file>\n");
+        return 1;
+    }
     FILE *fp;
 
-    char filename[100];
+    char *filename = argv[1];
 
-    printf("Enter the File Name: ");
-    scanf("%s", filename);
+    if (!has_frx_extension(filename)) {
+        printf("Error: Only .frx files are allowed\n");
+        return 0;
+    }
+
     fp=fopen(filename,"r");
 
     if(fp == NULL)
@@ -23,8 +44,6 @@ int main()
 
     initTokens();
     GetNextToken(fp);
-    // for(int i =0 ;i < tokencount; i++)
-    // printf("%s -> %d \n ", tokens[i]->lexeme , tokens[i]->type);
     fclose(fp);
 
     Node* root = parse();
@@ -45,12 +64,21 @@ int main()
     Node* current = root;
     
     generate_TAC(root);
-    print_TAC();
-    printf("\nThree Address Code is Successful");
+    // print_TAC();
+    // printf("\nThree Address Code is Successful\n\n");
     
     generate_riscv_code();
-    printf("RISC- V Code Generation Successful\n");
+    // printf("RISC- V Code Generation Successful\n");
     
-    // freeTAC();
+    FILE *f = fopen("a.out", "w");
+
+    fprintf(f,
+    "#!/bin/bash\n"
+    "java -jar rars.jar output.s\n");
+
+    fclose(f);
+
+    system("chmod +x a.out");
+
     freeAST(root);
 }
