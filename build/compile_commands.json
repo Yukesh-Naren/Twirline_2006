@@ -19,9 +19,9 @@
 },
 {
   "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",
-  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\ast.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\ast.c\"",
-  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/ast.c",
-  "output": "CMakeFiles/ferrox.dir/ast.c.obj"
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/ferrox.dir/includes_C.rsp -g -std=gnu11 -o CMakeFiles\\ferrox.dir\\AST.c.obj -c \"C:\\Users\\YUKESH NAREN\\Studies Oriented Folder\\SEMESTER 4\\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\\Compiler Building\\AST.c\"",
+  "file": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/AST.c",
+  "output": "CMakeFiles/ferrox.dir/AST.c.obj"
 },
 {
   "directory": "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build",

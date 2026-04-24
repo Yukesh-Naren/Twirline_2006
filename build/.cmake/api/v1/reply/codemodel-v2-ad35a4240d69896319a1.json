@@ -7,7 +7,8 @@
 			[
 				{
 					"build" : ".",
-					"jsonFile" : "directory-.-Debug-f040eec181a89de70dbe.json",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d1e94e1a86a3872cd19e.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.10"
@@ -28,7 +29,7 @@
 					[
 						0
 					],
-					"name" : "Ferrox",
+					"name" : "ferrox",
 					"targetIndexes" : 
 					[
 						0
@@ -40,7 +41,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ferrox::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ferrox-Debug-13628a1b03373c841514.json",
+					"jsonFile" : "target-ferrox-Debug-c8aa9c8f83b68b858c65.json",
 					"name" : "ferrox",
 					"projectIndex" : 0
 				}

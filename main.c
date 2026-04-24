@@ -72,13 +72,18 @@ int main(int argc, char* argv[])
     
     FILE *f = fopen("a.out", "w");
 
-    fprintf(f,
-    "#!/bin/bash\n"
-    "java -jar rars.jar output.s\n");
+	if (f == NULL) {
+    	printf("Error: could not create a.out\n");
+    	return 1;
+	}
 
-    fclose(f);
+	fprintf(f, "#!/bin/bash\n");
+	fprintf(f, "DIR=$(dirname \"$0\")\n");
+	fprintf(f, "java -jar \"$DIR/rars1_6.jar\" \"$DIR/output.s\"\n");
 
-    system("chmod +x a.out");
+	fclose(f);
+
+	system("chmod +x a.out");
 
     freeAST(root);
 }

@@ -37,6 +37,28 @@ if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "C:/MinGW/bin/objdump.exe")
 endif()
 
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/usr/local/bin/ferrox.exe")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  file(INSTALL DESTINATION "/usr/local/bin" TYPE EXECUTABLE FILES "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/ferrox.exe")
+  if(EXISTS "$ENV{DESTDIR}/usr/local/bin/ferrox.exe" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/bin/ferrox.exe")
+    if(CMAKE_INSTALL_DO_STRIP)
+      execute_process(COMMAND "C:/MinGW/bin/strip.exe" "$ENV{DESTDIR}/usr/local/bin/ferrox.exe")
+    endif()
+  endif()
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  include("C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/ferrox.dir/install-cxx-module-bmi-Debug.cmake" OPTIONAL)
+endif()
+
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)

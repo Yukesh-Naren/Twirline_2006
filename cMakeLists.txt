@@ -1,18 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Ferrox C)
+project(ferrox C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-include_directories(include)
 
 add_executable(ferrox
-    main.c
-    lexer.c
-    parser.c
-    ast.c
-    semantics.c
-    TAC.c
-    codegen.c
+main.c
+lexer.c
+parser.c
+AST.c
+semantics.c
+TAC.c
+codegen.c
 )
+
+target_include_directories(ferrox PRIVATE include)
+
+install(TARGETS ferrox DESTINATION /usr/local/bin)

@@ -116,20 +116,20 @@ CMakeFiles/ferrox.dir/parser.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ferrox.dir/parser.c.s"
 	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\parser.c" -o CMakeFiles\ferrox.dir\parser.c.s
 
-CMakeFiles/ferrox.dir/ast.c.obj: CMakeFiles/ferrox.dir/flags.make
-CMakeFiles/ferrox.dir/ast.c.obj: CMakeFiles/ferrox.dir/includes_C.rsp
-CMakeFiles/ferrox.dir/ast.c.obj: C:/Users/YUKESH\ NAREN/Studies\ Oriented\ Folder/SEMESTER\ 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler\ Building/ast.c
-CMakeFiles/ferrox.dir/ast.c.obj: CMakeFiles/ferrox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/ferrox.dir/ast.c.obj"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ferrox.dir/ast.c.obj -MF CMakeFiles\ferrox.dir\ast.c.obj.d -o CMakeFiles\ferrox.dir\ast.c.obj -c "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\ast.c"
+CMakeFiles/ferrox.dir/AST.c.obj: CMakeFiles/ferrox.dir/flags.make
+CMakeFiles/ferrox.dir/AST.c.obj: CMakeFiles/ferrox.dir/includes_C.rsp
+CMakeFiles/ferrox.dir/AST.c.obj: C:/Users/YUKESH\ NAREN/Studies\ Oriented\ Folder/SEMESTER\ 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler\ Building/AST.c
+CMakeFiles/ferrox.dir/AST.c.obj: CMakeFiles/ferrox.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/ferrox.dir/AST.c.obj"
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ferrox.dir/AST.c.obj -MF CMakeFiles\ferrox.dir\AST.c.obj.d -o CMakeFiles\ferrox.dir\AST.c.obj -c "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\AST.c"
 
-CMakeFiles/ferrox.dir/ast.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/ferrox.dir/ast.c.i"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\ast.c" > CMakeFiles\ferrox.dir\ast.c.i
+CMakeFiles/ferrox.dir/AST.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/ferrox.dir/AST.c.i"
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\AST.c" > CMakeFiles\ferrox.dir\AST.c.i
 
-CMakeFiles/ferrox.dir/ast.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ferrox.dir/ast.c.s"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\ast.c" -o CMakeFiles\ferrox.dir\ast.c.s
+CMakeFiles/ferrox.dir/AST.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ferrox.dir/AST.c.s"
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\YUKESH NAREN\Studies Oriented Folder\SEMESTER 4\124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K\Compiler Building\AST.c" -o CMakeFiles\ferrox.dir\AST.c.s
 
 CMakeFiles/ferrox.dir/semantics.c.obj: CMakeFiles/ferrox.dir/flags.make
 CMakeFiles/ferrox.dir/semantics.c.obj: CMakeFiles/ferrox.dir/includes_C.rsp
@@ -181,7 +181,7 @@ ferrox_OBJECTS = \
 "CMakeFiles/ferrox.dir/main.c.obj" \
 "CMakeFiles/ferrox.dir/lexer.c.obj" \
 "CMakeFiles/ferrox.dir/parser.c.obj" \
-"CMakeFiles/ferrox.dir/ast.c.obj" \
+"CMakeFiles/ferrox.dir/AST.c.obj" \
 "CMakeFiles/ferrox.dir/semantics.c.obj" \
 "CMakeFiles/ferrox.dir/TAC.c.obj" \
 "CMakeFiles/ferrox.dir/codegen.c.obj"
@@ -192,7 +192,7 @@ ferrox_EXTERNAL_OBJECTS =
 ferrox.exe: CMakeFiles/ferrox.dir/main.c.obj
 ferrox.exe: CMakeFiles/ferrox.dir/lexer.c.obj
 ferrox.exe: CMakeFiles/ferrox.dir/parser.c.obj
-ferrox.exe: CMakeFiles/ferrox.dir/ast.c.obj
+ferrox.exe: CMakeFiles/ferrox.dir/AST.c.obj
 ferrox.exe: CMakeFiles/ferrox.dir/semantics.c.obj
 ferrox.exe: CMakeFiles/ferrox.dir/TAC.c.obj
 ferrox.exe: CMakeFiles/ferrox.dir/codegen.c.obj

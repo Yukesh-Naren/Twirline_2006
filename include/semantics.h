@@ -1,7 +1,7 @@
 #ifndef SEMANTICS_H
 #define SEMANTICS_H
 
-#include "ast.h"
+#include "AST.h"
 
 #define TYPE_INT   1
 #define TYPE_FLOAT 2

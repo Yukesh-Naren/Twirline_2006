@@ -1,7 +1,7 @@
 #ifndef TAC_H
 #define TAC_H
 
-#include "ast.h"
+#include "AST.h"
 
 typedef struct TAC {
     char result[20];

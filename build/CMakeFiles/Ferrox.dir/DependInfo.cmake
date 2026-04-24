@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/AST.c" "CMakeFiles/ferrox.dir/AST.c.obj" "gcc" "CMakeFiles/ferrox.dir/AST.c.obj.d"
   "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/TAC.c" "CMakeFiles/ferrox.dir/TAC.c.obj" "gcc" "CMakeFiles/ferrox.dir/TAC.c.obj.d"
-  "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/ast.c" "CMakeFiles/ferrox.dir/ast.c.obj" "gcc" "CMakeFiles/ferrox.dir/ast.c.obj.d"
   "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/codegen.c" "CMakeFiles/ferrox.dir/codegen.c.obj" "gcc" "CMakeFiles/ferrox.dir/codegen.c.obj.d"
   "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/lexer.c" "CMakeFiles/ferrox.dir/lexer.c.obj" "gcc" "CMakeFiles/ferrox.dir/lexer.c.obj.d"
   "C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/main.c" "CMakeFiles/ferrox.dir/main.c.obj" "gcc" "CMakeFiles/ferrox.dir/main.c.obj.d"

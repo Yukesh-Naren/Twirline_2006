@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/ferrox.dir/AST.c.obj"
+  "CMakeFiles/ferrox.dir/AST.c.obj.d"
   "CMakeFiles/ferrox.dir/TAC.c.obj"
   "CMakeFiles/ferrox.dir/TAC.c.obj.d"
-  "CMakeFiles/ferrox.dir/ast.c.obj"
-  "CMakeFiles/ferrox.dir/ast.c.obj.d"
   "CMakeFiles/ferrox.dir/codegen.c.obj"
   "CMakeFiles/ferrox.dir/codegen.c.obj.d"
   "CMakeFiles/ferrox.dir/lexer.c.obj"

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ast.h"
+#include "AST.h"
 #include "semantics.h"
 
 Symbol* head = NULL;

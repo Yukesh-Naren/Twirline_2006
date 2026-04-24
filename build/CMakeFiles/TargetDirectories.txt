@@ -1,3 +1,7 @@
 C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/ferrox.dir
 C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/edit_cache.dir
 C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/rebuild_cache.dir
+C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/list_install_components.dir
+C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/install.dir
+C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/install/local.dir
+C:/Users/YUKESH NAREN/Studies Oriented Folder/SEMESTER 4/124CS0045_YUKESH_NAREN_M_124CS0066_MOHITHRA_K/Compiler Building/build/CMakeFiles/install/strip.dir

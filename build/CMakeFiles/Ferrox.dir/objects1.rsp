@@ -1,1 +1,1 @@
-CMakeFiles/ferrox.dir/main.c.obj CMakeFiles/ferrox.dir/lexer.c.obj CMakeFiles/ferrox.dir/parser.c.obj CMakeFiles/ferrox.dir/ast.c.obj CMakeFiles/ferrox.dir/semantics.c.obj CMakeFiles/ferrox.dir/TAC.c.obj CMakeFiles/ferrox.dir/codegen.c.obj
+CMakeFiles/ferrox.dir/main.c.obj CMakeFiles/ferrox.dir/lexer.c.obj CMakeFiles/ferrox.dir/parser.c.obj CMakeFiles/ferrox.dir/AST.c.obj CMakeFiles/ferrox.dir/semantics.c.obj CMakeFiles/ferrox.dir/TAC.c.obj CMakeFiles/ferrox.dir/codegen.c.obj

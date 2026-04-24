@@ -1,9 +1,12 @@
 #!/bin/bash
 
-if[ $# -lt 1 ]; then 
-    echo "Usage: ./run.sh file.frx"
-    exit 1
+if [ ! -d build ]; then
+    mkdir build
+    cd build
+    cmake ..
+    make
+    cd ..
 fi
 
 ./build/ferrox "$1" || exit 1
-java -jar rars.jar output.s
+java -jar rars1_6.jar output.s

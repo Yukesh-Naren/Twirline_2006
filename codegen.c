@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "codegen.h"
-#include "tac.h"
+#include "TAC.h"
 #include "semantics.h"
 
 FILE* out;
@@ -685,4 +685,5 @@ void generate_riscv_code() {
         EMIT("    ecall\n");
     }
     fclose(out);
+    
 }
