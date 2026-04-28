@@ -15,8 +15,8 @@ Token* CreateToken(Tokentype type, char *lexeme){
     Token *t =(Token*)malloc(sizeof(Token));
 
     t->type = type;
-    strncpy(t->lexeme,lexeme,63);
-    t->lexeme[63] = '\0';
+    strncpy(t->lexeme,lexeme,511);
+    t->lexeme[511] = '\0';
     return t;
 }
 
@@ -30,7 +30,7 @@ void addToken(Token *t)
     
     tokens[tokencount++] = t;
 
-    // printf("TOKEN[%d]: '%s'\n", tokencount, t->lexeme);
+    //printf("TOKEN[%d]: '%s'\n", tokencount, t->lexeme);
 }
 
 
@@ -125,7 +125,7 @@ void GetNextToken(FILE* fp)
         }
         else if( ch == '"')
         {
-            char buffer[50];
+            char buffer[512];
             int c=0;
             int j=0;
             ch = fgetc(fp);

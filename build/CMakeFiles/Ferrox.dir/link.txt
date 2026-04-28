@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\ferrox.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\ferrox.dir/objects.a @CMakeFiles\ferrox.dir\objects1.rsp
-C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\ferrox.dir/objects.a -Wl,--no-whole-archive -o ferrox.exe -Wl,--out-implib,libferrox.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\ferrox.dir\linkLibs.rsp

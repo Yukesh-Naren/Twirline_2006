@@ -1,11 +1,11 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include "lexer.h"
-#include "parser.h"
-#include "AST.h"
-#include "semantics.h"
-#include "TAC.h"
-#include "codegen.h"
+#include "include/lexer.h"
+#include "include/parser.h"
+#include "include/AST.h"
+#include "include/semantics.h"
+#include "include/TAC.h"
+#include "include/codegen.h"
 #include <string.h>
 
 int has_frx_extension(const char *filename) {
@@ -57,14 +57,14 @@ int main(int argc, char* argv[])
     // printf("\nRunning Semantic Analysis...\n");
 
     check_semantics(root);
-    // print_symbol_table();
-    // printf("\nSemantic Analysis Completed Successfully\n");
+    //print_symbol_table();
+    //printf("\nSemantic Analysis Completed Successfully\n");
 
     // printf("Starting TAC generation...\n");
     Node* current = root;
     
     generate_TAC(root);
-    // print_TAC();
+    //print_TAC();
     // printf("\nThree Address Code is Successful\n\n");
     
     generate_riscv_code();

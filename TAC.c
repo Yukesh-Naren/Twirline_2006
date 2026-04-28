@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "TAC.h"
-#include "AST.h"
-#include "semantics.h"
+#include "include/TAC.h"
+#include "include/AST.h"
+#include "include/semantics.h"
 
 TAC* tacHead = NULL;
 TAC* tacTail = NULL;

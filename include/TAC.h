@@ -4,10 +4,10 @@
 #include "AST.h"
 
 typedef struct TAC {
-    char result[20];
-    char arg1[20];
-    char op[10];
-    char arg2[20];
+    char result[512];
+    char arg1[512];
+    char op[512];
+    char arg2[512];
     int type;
     struct TAC* next;
 } TAC;

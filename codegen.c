@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "codegen.h"
-#include "TAC.h"
-#include "semantics.h"
+#include "include/codegen.h"
+#include "include/TAC.h"
+#include "include/semantics.h"
 
 FILE* out;
 #define MAX_VARS 500
